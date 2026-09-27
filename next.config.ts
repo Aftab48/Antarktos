@@ -7,6 +7,8 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  // Our AGENTS.md / CLAUDE.md are hand-written; don't let `next dev` append its own agent-rules block.
+  agentRules: false,
   images: {
     localPatterns: [
       {
