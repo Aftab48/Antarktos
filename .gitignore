@@ -55,6 +55,9 @@ node_modules/
 /data/
 /artifacts/
 
-# agency agents (installed locally per tool, see AGENTS.md)
-/.claude/agents/
+# agent config and rules (local only)
+/AGENTS.md
+/CLAUDE.md
+/prompts.md
+/.claude/
 /.codex/
