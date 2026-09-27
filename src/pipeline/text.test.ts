@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { parseCaption, parseSummary } from './ai'
+import { parseCaption, parseSummary, parseTranslation } from './ai'
 import { guardPipelineFields } from './index'
 import { chunkPages, cleanPages, groundText, needsOcr } from './text'
 
@@ -43,16 +43,25 @@ test('groundText drops uncited sentences, invalid citations and unmatched number
 test('parseSummary validates schema and language, then grounds', () => {
   const chunks = new Map([[1, 'NCPOR invites proposals for the 43rd expedition.']])
   const ok = parseSummary(
-    '```json\n{"summary_en":"NCPOR invites proposals for the 43rd expedition [c:1]. Extra claim.","summary_hi":"एनसीपीओआर 43वें अभियान के लिए प्रस्ताव आमंत्रित करता है [c:1]।","keywords":["Antarctica","proposals"]}\n```',
+    '```json\n{"summary_en":"NCPOR invites proposals for the 43rd expedition [c:1]. Extra claim.","keywords":["Antarctica","proposals"]}\n```',
     chunks,
   )
   assert.equal(ok.summary_en, 'NCPOR invites proposals for the 43rd expedition [c:1].')
   assert.deepEqual(ok.keywords, ['antarctica', 'proposals'])
   assert.deepEqual(ok.dropped, ['Extra claim.'])
-  assert.throws(() => parseSummary('{"summary_en":"a [c:1].","summary_hi":"English text [c:1].","keywords":["x"]}', chunks), /not in Hindi/)
-  assert.throws(() => parseSummary('{"summary_en":"a [c:1].","summary_hi":"हिंदी [c:1]।"}', chunks), /keywords/)
+  assert.throws(() => parseSummary('{"summary_en":"एनसीपीओआर प्रस्ताव आमंत्रित करता है [c:1]।","keywords":["x"]}', chunks), /not in English/)
+  assert.throws(() => parseSummary('{"summary_en":"a [c:1]."}', chunks), /keywords/)
   assert.throws(() => parseSummary('not json', chunks))
-  assert.throws(() => parseSummary('{"summary_en":"No citation here.","summary_hi":"हिंदी [c:1]।","keywords":["x"]}', chunks), /valid \[c:/)
+  assert.throws(() => parseSummary('{"summary_en":"No citation here.","keywords":["x"]}', chunks), /valid \[c:/)
+})
+
+test('parseTranslation keeps the English citations and numbers', () => {
+  const en = 'NCPOR invites proposals for the 43rd expedition [c:1]. It runs in 2023-24 [c:2].'
+  const good = 'एनसीपीओआर 43वें अभियान के लिए प्रस्ताव आमंत्रित करता है [c:1]। यह 2023-24 में चलेगा [c:2]।'
+  assert.equal(parseTranslation(JSON.stringify({ summary_hi: good }), en), good)
+  assert.throws(() => parseTranslation(JSON.stringify({ summary_hi: 'एनसीपीओआर 43वें अभियान के लिए प्रस्ताव [c:1]।' }), en), /cites/)
+  assert.throws(() => parseTranslation(JSON.stringify({ summary_hi: 'एनसीपीओआर 44वें अभियान के लिए [c:1]। यह 2023-24 में चलेगा [c:2]।' }), en), /numbers not in the English: 44/)
+  assert.throws(() => parseTranslation(JSON.stringify({ summary_hi: en }), en), /not in Hindi/)
 })
 
 test('parseCaption checks fields, alt length and Hindi script', () => {

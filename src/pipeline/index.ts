@@ -4,7 +4,7 @@ import { after } from 'next/server'
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, CollectionBeforeChangeHook, CollectionSlug, Payload } from 'payload'
 import { extractText, getDocumentProxy } from 'unpdf'
 
-import { caption, summarize, type SourceChunk } from './ai'
+import { caption, summarize, translateSummary, type SourceChunk } from './ai'
 import { chunkPages, cleanPages, needsOcr, stripMarkers } from './text'
 
 type Doc = Record<string, any>
@@ -164,17 +164,26 @@ export async function processRecord(payload: Payload, collection: string, id: nu
         result.chunks += rows.length
       }
 
-      const summaryMissing = ['en', 'hi'].some((l) => !first(doc.summary, l as Locale))
-      if (collection === 'reports' && state === 'ready' && summaryMissing) {
-        const chunks = await pageChunks(payload, collection, id)
-        if (chunks.length) {
-          const meta = metadataLines([['Title', first(doc.title, 'en')], ['Report type', doc.report_type], ['Year', doc.year], ['Region', doc.region]])
-          const call = await summarize(meta, chunks)
-          result.llm.push({ step: 'summary', model: call.model, attempts: call.attempts, costUsd: call.costUsd, raw: call.raw })
-          result.dropped = call.out.dropped
-          if (!first(doc.summary, 'en')) en.summary = call.out.summary_en
-          if (!first(doc.summary, 'hi')) hi.summary = call.out.summary_hi
-          if (!doc.keywords?.length) en.keywords = call.out.keywords
+      // English summary from the chunks; the Hindi summary is a translation of the English one,
+      // whether the English was AI-written or staff-written.
+      if (collection === 'reports' && state === 'ready') {
+        let summaryEn = first(doc.summary, 'en')
+        if (!summaryEn) {
+          const chunks = await pageChunks(payload, collection, id)
+          if (chunks.length) {
+            const meta = metadataLines([['Title', first(doc.title, 'en')], ['Report type', doc.report_type], ['Year', doc.year], ['Region', doc.region]])
+            const call = await summarize(meta, chunks)
+            result.llm.push({ step: 'summary', model: call.model, attempts: call.attempts, costUsd: call.costUsd, raw: call.raw })
+            result.dropped = call.out.dropped
+            en.summary = summaryEn = call.out.summary_en
+            if (!doc.keywords?.length) en.keywords = call.out.keywords
+            aiFilled = true
+          }
+        }
+        if (summaryEn && !first(doc.summary, 'hi')) {
+          const call = await translateSummary(summaryEn)
+          result.llm.push({ step: 'summary_hi', model: call.model, attempts: call.attempts, costUsd: call.costUsd, raw: call.raw })
+          hi.summary = call.out
           aiFilled = true
         }
       }
