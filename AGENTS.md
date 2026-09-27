@@ -7,6 +7,9 @@
 - Stack: Next.js (App Router, TypeScript) + Payload CMS 3 running inside the same Next.js app + Neon Postgres via `@payloadcms/db-postgres` + Cloudflare R2 via `@payloadcms/storage-s3` + `openai` npm SDK pointed at OpenRouter (`baseURL: https://openrouter.ai/api/v1`) (plan §15). Deploy target: Vercel.
 - Do not use Supabase, Prisma, Clerk, NextAuth, Firebase, Cloudinary, the Anthropic SDK or any provider-specific LLM SDK. Payload's built-in auth is the only auth.
 - No Redis/queues, no separate vector DB, no embeddings, no microservices, no native mobile app, no social media APIs, no OCR (plan §17 "Cut").
+- No analytics, A/B testing, feedback widgets or tracking scripts.
+- Public-site styling: Tailwind CSS + shadcn/ui, scoped to the public `(frontend)` route group only. Never load Tailwind or its base styles into the Payload admin (`(payload)` route group); style admin custom components with Payload's own CSS variables.
+- Public UI strings: plain dictionaries `src/i18n/en.json` and `src/i18n/hi.json` with a small typed lookup helper. No i18n library (no next-intl, i18next, FormatJS). Locale comes from the URL (`/` = English, `/hi` = Hindi). Dates and numbers use the built-in `Intl` APIs with `en-IN` / `hi-IN`. Content text comes from Payload localization, not the dictionaries.
 - Payload first: before writing code for admin UI, auth, roles, uploads, drafts, versions or localization, use the Payload built-in feature if one exists.
 - Large files upload from the browser straight to R2 (client uploads), never through a Vercel function body (plan §4, §15).
 - Search and ask-the-archive use Postgres full-text search on the `archive_chunks` table (plan §11, §12). `english` config for English, `simple` for Hindi.

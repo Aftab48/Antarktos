@@ -54,3 +54,7 @@ node_modules/
 /docs/
 /data/
 /artifacts/
+
+# agency agents (installed locally per tool, see AGENTS.md)
+/.claude/agents/
+/.codex/
