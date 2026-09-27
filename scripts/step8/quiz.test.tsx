@@ -25,11 +25,14 @@ test('English and Hindi browser quizzes select, reveal a cited explanation, and 
       assert.equal(container.querySelectorAll('input[type="radio"]').length, 20)
       const buttons = Array.from(container.querySelectorAll('button'))
       assert.equal(buttons[0].disabled, true)
-      assert.equal(container.querySelector('[role="status"]'), null)
+      const status = container.querySelector('[role="status"]')!
+      assert.ok(status, 'feedback live region exists before its content changes')
+      assert.equal(status.textContent, '')
       await act(async () => (container.querySelectorAll('input')[2] as HTMLInputElement).click())
       assert.equal((container.querySelector('button') as HTMLButtonElement).disabled, false)
       await act(async () => (container.querySelector('button') as HTMLButtonElement).click())
       const result = container.querySelector('[role="status"]')!
+      assert.ok(result === status, 'checking updates the existing live region')
       assert.ok(result.textContent?.includes(t('learn.correct')))
       assert.ok(result.textContent?.includes(explanation))
       assert.equal(result.querySelector('a')?.getAttribute('href'), 'https://example.test/source.pdf#page=2')
@@ -37,7 +40,8 @@ test('English and Hindi browser quizzes select, reveal a cited explanation, and 
       const reset = Array.from(container.querySelectorAll('button')).find((button) => button.textContent === t('learn.resetQuiz'))!
       await act(async () => reset.click())
       assert.equal(container.querySelectorAll('input:checked').length, 0)
-      assert.equal(container.querySelector('[role="status"]'), null)
+      assert.ok(container.querySelector('[role="status"]') === status, 'reset preserves the live region')
+      assert.equal(status.textContent, '')
       await act(async () => (container.querySelector('input') as HTMLInputElement).click())
       await act(async () => (container.querySelector('button') as HTMLButtonElement).click())
       assert.ok(container.querySelector('[role="status"]')?.textContent?.includes(t('learn.tryAgain')))
