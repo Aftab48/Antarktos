@@ -68,7 +68,14 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    expeditions: Expedition;
+    stations: Station;
+    reports: Report;
+    datasets: Dataset;
+    publications: Publication;
     media: Media;
+    events: Event;
+    'outreach-posts': OutreachPost;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -77,7 +84,14 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    expeditions: ExpeditionsSelect<false> | ExpeditionsSelect<true>;
+    stations: StationsSelect<false> | StationsSelect<true>;
+    reports: ReportsSelect<false> | ReportsSelect<true>;
+    datasets: DatasetsSelect<false> | DatasetsSelect<true>;
+    publications: PublicationsSelect<false> | PublicationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    'outreach-posts': OutreachPostsSelect<false> | OutreachPostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -86,10 +100,10 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('en' | 'hi') | ('en' | 'hi')[];
   globals: {};
   globalsSelect: {};
-  locale: null;
+  locale: 'en' | 'hi';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -123,6 +137,8 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  name?: string | null;
+  role: 'admin' | 'editor' | 'reviewer';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -145,14 +161,80 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expeditions".
+ */
+export interface Expedition {
+  id: number;
+  title: string;
+  number?: string | null;
+  region: 'antarctic' | 'arctic' | 'southern_ocean' | 'himalaya';
+  season_start?: number | null;
+  season_end?: number | null;
+  leader?: string | null;
+  stations?: (number | Station)[] | null;
+  summary?: string | null;
+  highlights?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  cover?: (number | null) | Media;
+  source_url?: string | null;
+  license?: string | null;
+  credit?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stations".
+ */
+export interface Station {
+  id: number;
+  name: string;
+  region: 'antarctic' | 'arctic' | 'southern_ocean' | 'himalaya';
+  lat?: number | null;
+  lng?: number | null;
+  established?: number | null;
+  decommissioned?: number | null;
+  operational_status?: ('active' | 'historical') | null;
+  description?: string | null;
+  cover?: (number | null) | Media;
+  source_url?: string | null;
+  license?: string | null;
+  credit?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: number;
+  youtube_url?: string | null;
+  caption?: string | null;
   alt: string;
+  tags?: string[] | null;
+  region?: ('antarctic' | 'arctic' | 'southern_ocean' | 'himalaya') | null;
+  expedition?: (number | null) | Expedition;
+  stations?: (number | Station)[] | null;
+  taken_at?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  source_url?: string | null;
+  license?: string | null;
+  credit?: string | null;
+  processing_state?: ('queued' | 'processing' | 'ready' | 'needs_ocr' | 'failed') | null;
+  processing_error?: string | null;
+  ai_generated?: boolean | null;
   _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
   url?: string | null;
   thumbnailURL?: string | null;
   filename?: string | null;
@@ -162,6 +244,252 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    large?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports".
+ */
+export interface Report {
+  id: number;
+  title: string;
+  report_type?: ('expedition' | 'annual' | 'technical' | 'other') | null;
+  region?: ('antarctic' | 'arctic' | 'southern_ocean' | 'himalaya') | null;
+  expedition?: (number | null) | Expedition;
+  stations?: (number | Station)[] | null;
+  year?: number | null;
+  summary?: string | null;
+  keywords?: string[] | null;
+  page_count?: number | null;
+  source_url?: string | null;
+  license?: string | null;
+  credit?: string | null;
+  processing_state?: ('queued' | 'processing' | 'ready' | 'needs_ocr' | 'failed') | null;
+  processing_error?: string | null;
+  ai_generated?: boolean | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "datasets".
+ */
+export interface Dataset {
+  id: number;
+  title: string;
+  abstract?: string | null;
+  keywords?: string[] | null;
+  /**
+   * Parameters measured
+   */
+  parameters?: string[] | null;
+  temporal_from?: string | null;
+  temporal_to?: string | null;
+  region?: ('antarctic' | 'arctic' | 'southern_ocean' | 'himalaya') | null;
+  year?: number | null;
+  expedition?: (number | null) | Expedition;
+  stations?: (number | Station)[] | null;
+  /**
+   * Spatial coverage in decimal degrees, if wider than the stations
+   */
+  bbox?: {
+    west?: number | null;
+    south?: number | null;
+    east?: number | null;
+    north?: number | null;
+  };
+  format?: string | null;
+  /**
+   * Data portal link, if the file is not uploaded here
+   */
+  external_url?: string | null;
+  doi?: string | null;
+  contact?: string | null;
+  source_url?: string | null;
+  license?: string | null;
+  credit?: string | null;
+  processing_state?: ('queued' | 'processing' | 'ready' | 'needs_ocr' | 'failed') | null;
+  processing_error?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "publications".
+ */
+export interface Publication {
+  id: number;
+  title: string;
+  authors?: string[] | null;
+  venue?: string | null;
+  year?: number | null;
+  doi?: string | null;
+  /**
+   * Link to the paper (publisher or repository page)
+   */
+  link?: string | null;
+  abstract?: string | null;
+  region?: ('antarctic' | 'arctic' | 'southern_ocean' | 'himalaya') | null;
+  expedition?: (number | null) | Expedition;
+  stations?: (number | Station)[] | null;
+  source_url?: string | null;
+  license?: string | null;
+  credit?: string | null;
+  processing_state?: ('queued' | 'processing' | 'ready' | 'needs_ocr' | 'failed') | null;
+  processing_error?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  date?: string | null;
+  event_type?: ('workshop' | 'school_outreach' | 'launch' | 'flag_off' | 'conference' | 'visit') | null;
+  description?: string | null;
+  location?: string | null;
+  media?: (number | Media)[] | null;
+  region?: ('antarctic' | 'arctic' | 'southern_ocean' | 'himalaya') | null;
+  expedition?: (number | null) | Expedition;
+  stations?: (number | Station)[] | null;
+  source_url?: string | null;
+  license?: string | null;
+  credit?: string | null;
+  processing_state?: ('queued' | 'processing' | 'ready' | 'needs_ocr' | 'failed') | null;
+  processing_error?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outreach-posts".
+ */
+export interface OutreachPost {
+  id: number;
+  source:
+    | {
+        relationTo: 'reports';
+        value: number | Report;
+      }
+    | {
+        relationTo: 'datasets';
+        value: number | Dataset;
+      }
+    | {
+        relationTo: 'publications';
+        value: number | Publication;
+      }
+    | {
+        relationTo: 'media';
+        value: number | Media;
+      }
+    | {
+        relationTo: 'events';
+        value: number | Event;
+      }
+    | {
+        relationTo: 'expeditions';
+        value: number | Expedition;
+      }
+    | {
+        relationTo: 'stations';
+        value: number | Station;
+      };
+  platform: 'blog' | 'x' | 'instagram' | 'linkedin' | 'press_note' | 'student_explainer';
+  language: 'en' | 'hi';
+  title?: string | null;
+  body: string;
+  thread?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  hashtags?: string[] | null;
+  quiz?:
+    | {
+        question: string;
+        options: string[];
+        answer_index: number;
+        explanation?: string | null;
+        chunk_id?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  suggested_media?: (number | null) | Media;
+  cited_chunk_ids?: number[] | null;
+  checks?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  model?: string | null;
+  prompt_version?: string | null;
+  review_status?: ('pending' | 'approved' | 'rejected') | null;
+  reviewed_by?: (number | null) | User;
+  reviewed_at?: string | null;
+  review_note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -192,8 +520,36 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'expeditions';
+        value: number | Expedition;
+      } | null)
+    | ({
+        relationTo: 'stations';
+        value: number | Station;
+      } | null)
+    | ({
+        relationTo: 'reports';
+        value: number | Report;
+      } | null)
+    | ({
+        relationTo: 'datasets';
+        value: number | Dataset;
+      } | null)
+    | ({
+        relationTo: 'publications';
+        value: number | Publication;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'outreach-posts';
+        value: number | OutreachPost;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -242,6 +598,8 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -262,13 +620,76 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "expeditions_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
+export interface ExpeditionsSelect<T extends boolean = true> {
+  title?: T;
+  number?: T;
+  region?: T;
+  season_start?: T;
+  season_end?: T;
+  leader?: T;
+  stations?: T;
+  summary?: T;
+  highlights?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  cover?: T;
+  source_url?: T;
+  license?: T;
+  credit?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stations_select".
+ */
+export interface StationsSelect<T extends boolean = true> {
+  name?: T;
+  region?: T;
+  lat?: T;
+  lng?: T;
+  established?: T;
+  decommissioned?: T;
+  operational_status?: T;
+  description?: T;
+  cover?: T;
+  source_url?: T;
+  license?: T;
+  credit?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports_select".
+ */
+export interface ReportsSelect<T extends boolean = true> {
+  title?: T;
+  report_type?: T;
+  region?: T;
+  expedition?: T;
+  stations?: T;
+  year?: T;
+  summary?: T;
+  keywords?: T;
+  page_count?: T;
+  source_url?: T;
+  license?: T;
+  credit?: T;
+  processing_state?: T;
+  processing_error?: T;
+  ai_generated?: T;
   _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
   url?: T;
   thumbnailURL?: T;
   filename?: T;
@@ -278,6 +699,208 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "datasets_select".
+ */
+export interface DatasetsSelect<T extends boolean = true> {
+  title?: T;
+  abstract?: T;
+  keywords?: T;
+  parameters?: T;
+  temporal_from?: T;
+  temporal_to?: T;
+  region?: T;
+  year?: T;
+  expedition?: T;
+  stations?: T;
+  bbox?:
+    | T
+    | {
+        west?: T;
+        south?: T;
+        east?: T;
+        north?: T;
+      };
+  format?: T;
+  external_url?: T;
+  doi?: T;
+  contact?: T;
+  source_url?: T;
+  license?: T;
+  credit?: T;
+  processing_state?: T;
+  processing_error?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "publications_select".
+ */
+export interface PublicationsSelect<T extends boolean = true> {
+  title?: T;
+  authors?: T;
+  venue?: T;
+  year?: T;
+  doi?: T;
+  link?: T;
+  abstract?: T;
+  region?: T;
+  expedition?: T;
+  stations?: T;
+  source_url?: T;
+  license?: T;
+  credit?: T;
+  processing_state?: T;
+  processing_error?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  youtube_url?: T;
+  caption?: T;
+  alt?: T;
+  tags?: T;
+  region?: T;
+  expedition?: T;
+  stations?: T;
+  taken_at?: T;
+  lat?: T;
+  lng?: T;
+  source_url?: T;
+  license?: T;
+  credit?: T;
+  processing_state?: T;
+  processing_error?: T;
+  ai_generated?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  date?: T;
+  event_type?: T;
+  description?: T;
+  location?: T;
+  media?: T;
+  region?: T;
+  expedition?: T;
+  stations?: T;
+  source_url?: T;
+  license?: T;
+  credit?: T;
+  processing_state?: T;
+  processing_error?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outreach-posts_select".
+ */
+export interface OutreachPostsSelect<T extends boolean = true> {
+  source?: T;
+  platform?: T;
+  language?: T;
+  title?: T;
+  body?: T;
+  thread?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  hashtags?: T;
+  quiz?:
+    | T
+    | {
+        question?: T;
+        options?: T;
+        answer_index?: T;
+        explanation?: T;
+        chunk_id?: T;
+        id?: T;
+      };
+  suggested_media?: T;
+  cited_chunk_ids?: T;
+  checks?: T;
+  model?: T;
+  prompt_version?: T;
+  review_status?: T;
+  reviewed_by?: T;
+  reviewed_at?: T;
+  review_note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
