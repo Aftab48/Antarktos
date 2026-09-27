@@ -3,13 +3,18 @@
 Give the coding agent one prompt at a time. After each one, check the **Done when** line yourself before moving on.
 The agent reads `AGENTS.md`, and that file points it to `plan/SIH26063_plan.md`.
 
-**Setup status:** Payload 3 scaffold ✓ (blank template, Postgres adapter), git repo ✓ (github.com/Aftab48/SIH26063), `PAYLOAD_SECRET` ✓ (dev value in `.env`, rotate before final deploy), OpenRouter ✓ (credits), Neon ☐, Cloudflare R2 ☐, Vercel ☐
+**Models:** Opus 5.5 in Claude Code builds (it leads the independent Coding Agent Index and costs less per task). GPT-6 Astra in Codex runs the review checkpoints and the final demo check. Sonnet 5 runs the dataset script. Each step names its model.
+Both tools read the same rules: Codex reads `AGENTS.md` directly, and Claude Code reads `CLAUDE.md`, which imports it. Install each agent a step uses for the tool that runs it: `.claude/agents/` for Claude Code, `.codex/agents/` for Codex.
+
+**Setup status:** Payload 3 scaffold ✓ (blank template, Postgres adapter), git repo ✓ (github.com/Aftab48/SIH26063), `PAYLOAD_SECRET` ✓ (dev value in `.env`, rotate before final deploy), OpenRouter ✓ (credits), Neon ✓ (pooled + direct URLs), Vercel ✓ (https://sih26063.vercel.app), Cloudflare R2 ☐
 
 Before prompt 1: create the Neon project, the R2 bucket + API token, and a Vercel project; put the values in `.env` (Payload's default, gitignored).
 
 ---
 
 ## 1. Day-1 checks
+
+**Model:** Opus 5.5 in Claude Code
 
 ```text
 Use the Rapid Prototyper agent. Do plan §18 "Day-1 checks" only.
@@ -32,6 +37,8 @@ Recommend LLM_MODEL_TEXT and LLM_MODEL_VISION.
 
 ## 2. Collections, roles, localization, seed
 
+**Model:** Opus 5.5 in Claude Code
+
 ```text
 Use the Rapid Prototyper agent. Build plan §16 as Payload collections:
 users (roles admin/editor/reviewer), expeditions, stations, reports, datasets, publications, media, events, outreach-posts.
@@ -48,6 +55,8 @@ Don't build the pipeline or any AI yet.
 ---
 
 ## 3. Processing pipeline
+
+**Model:** Opus 5.5 in Claude Code
 
 ```text
 Use the Rapid Prototyper agent. Build plan §7:
@@ -66,6 +75,8 @@ Test with 2 PDFs and 3 photos only.
 
 ## 4. Checkpoint review
 
+**Model:** GPT-6 Astra in Codex. A different model from the builder catches different mistakes.
+
 ```text
 Use the Code Reviewer agent, then the AI-Generated Code Security Auditor agent, on everything built so far.
 Focus on: exposed secrets, Payload access control (can the public read drafts? can an editor publish?), upload type/size checks, prompt injection via PDF and image text, and error handling that leaves records stuck in processing.
@@ -75,6 +86,8 @@ Fix confirmed issues only. List what you fixed and what you skipped, with reason
 ---
 
 ## 5. Public portal
+
+**Model:** Opus 5.5 in Claude Code
 
 ```text
 Use the Frontend Developer agent. Build the plan §15 public pages: home, expeditions timeline, expedition detail, stations, station detail, archive browse with filters, record detail pages (report, dataset, publication, media, event), about.
@@ -91,6 +104,8 @@ Leave slots for search, ask, learn and news (next steps); don't build them.
 
 ## 6. Search + ask the archive
 
+**Model:** Opus 5.5 in Claude Code
+
 ```text
 Use the Prompt Engineer agent to write the ask-the-archive prompt (§12: answer only from chunks, question's language, [c:id] per sentence) and the optional question-to-keywords prompt with its plain fallback.
 Then use the Rapid Prototyper agent to build GET /api/search and POST /api/ask as in §11 and §12: websearch_to_tsquery, filters, ts_rank, one result per document with a ts_headline snippet; the ask guard (length cap, per-IP-hash rate limit, 24h cache in ask_log); the zero-hit path with no LLM call; dropping uncited sentences and invalid citations.
@@ -104,6 +119,8 @@ Test with 3 English and 3 Hindi questions, including one the archive can't answe
 
 ## 7. Outreach generation
 
+**Model:** Opus 5.5 in Claude Code
+
 ```text
 Use the Content Creator agent to write a short platform guide for §10.1: tone, structure and one good example per platform (blog, x, instagram, linkedin, press_note, student_explainer) for a government science body, in English and Hindi. Save it to docs/platform-guide.md.
 Then use the Prompt Engineer agent to write the generation prompt from §10.1 and §10.2 using that guide, with the strict JSON schema and a validator.
@@ -116,6 +133,8 @@ Test on 2 records only.
 ---
 
 ## 8. Review UI, news, learn
+
+**Model:** Opus 5.5 in Claude Code
 
 ```text
 Use the Frontend Developer agent. Build:
@@ -131,6 +150,8 @@ Use Payload admin custom components where a built-in feature doesn't exist.
 
 ## 9. Second checkpoint
 
+**Model:** GPT-6 Astra in Codex. A different model from the builder catches different mistakes.
+
 ```text
 Use the Code Reviewer agent, then the AI-Generated Code Security Auditor agent, on everything built since the last review.
 Focus on: uncited or unchecked generated content reaching the public, the public /api/ask (rate limit, cost, prompt injection), access control on publishing, and secrets.
@@ -140,6 +161,8 @@ Fix confirmed issues only. List what you fixed and what you skipped, with reason
 ---
 
 ## 10. Hindi + accessibility pass
+
+**Model:** Opus 5.5 in Claude Code
 
 ```text
 Use the Internationalization Engineer agent to find English leftovers on /hi pages, missing lang attributes, date/number formatting for hi-IN, and Devanagari font rendering. Fix them.
@@ -153,6 +176,8 @@ Don't add features.
 
 ## 11. Stretch (only if time allows)
 
+**Model:** Opus 5.5 in Claude Code
+
 ```text
 Use the Rapid Prototyper agent. Build stretch items 1 and 2 from plan §17:
 - the station map (Leaflet; polar projection only if simple)
@@ -164,6 +189,8 @@ Stop after each item so I can test it.
 
 ## 12. Visual polish
 
+**Model:** Opus 5.5 in Claude Code
+
 ```text
 Use the UI Designer agent. Polish only the demo path in plan §19: a consistent visual language suited to a government science portal, loading and empty states, processing-state indicators, readable citations and check lists.
 Don't add features.
@@ -172,6 +199,8 @@ Don't add features.
 ---
 
 ## 13. Pre-demo check
+
+**Model:** GPT-6 Astra in Codex. It didn't build the app, so it checks the demo without the builder's assumptions.
 
 ```text
 Use the Reality Checker agent. Walk through the plan §19 demo story step by step on the deployed Vercel app with the demo dataset.
@@ -182,6 +211,8 @@ List what would embarrass us in front of judges, most severe first.
 ---
 
 ## D. Demo dataset (run in a second session, alongside the build)
+
+**Model:** Sonnet 5 in Claude Code. A simple script, so the cheaper model is enough.
 
 This only touches `scripts/dataset/` and `data/`, so it won't conflict with the main build.
 
@@ -201,6 +232,8 @@ Report counts per query and license, how many photos have a date or GPS, and que
 ---
 
 ## If a step goes off course
+
+**Model:** whichever model ran the step.
 
 ```text
 Revert the last step's changes and redo it, following AGENTS.md and the plan sections it references. Smallest working change only.
