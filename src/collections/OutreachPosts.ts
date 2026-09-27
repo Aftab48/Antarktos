@@ -1,6 +1,7 @@
-import type { CollectionConfig } from 'payload'
+import type { Access, CollectionConfig } from 'payload'
 
 import { canPublishField, contentAccess, onlyPublishersPublish } from '../access'
+import { guardOutreach, staffRole } from '../outreach/access'
 
 const reviewerOnly = { create: canPublishField, update: canPublishField }
 
@@ -9,19 +10,15 @@ const reviewerOnly = { create: canPublishField, update: canPublishField }
 export const OutreachPosts: CollectionConfig = {
   slug: 'outreach-posts',
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'platform', 'language', 'review_status', '_status'] },
-  access: contentAccess,
+  access: {
+    ...contentAccess,
+    read: (({ req }) => staffRole(req.user?.role) ? true : { _status: { equals: 'published' }, review_status: { equals: 'approved' } }) as Access,
+  },
   versions: { drafts: true },
   hooks: {
     beforeChange: [
       onlyPublishersPublish,
-      // Stamp who reviewed and when, whenever the review decision changes.
-      ({ data, originalDoc, req }) => {
-        if (req.user && data.review_status && data.review_status !== (originalDoc?.review_status ?? 'pending')) {
-          data.reviewed_by = req.user.id
-          data.reviewed_at = new Date().toISOString()
-        }
-        return data
-      },
+      guardOutreach,
     ],
   },
   fields: [
@@ -31,6 +28,7 @@ export const OutreachPosts: CollectionConfig = {
       relationTo: ['reports', 'datasets', 'publications', 'media', 'events', 'expeditions', 'stations'],
       required: true,
     },
+    { name: 'sources', type: 'relationship', hasMany: true, relationTo: ['reports', 'datasets', 'publications', 'media', 'events', 'expeditions', 'stations'], admin: { readOnly: true } },
     {
       name: 'platform',
       type: 'select',
@@ -47,6 +45,9 @@ export const OutreachPosts: CollectionConfig = {
     { name: 'language', type: 'select', required: true, options: ['en', 'hi'] },
     { name: 'title', type: 'text' },
     { name: 'body', type: 'textarea', required: true },
+    { name: 'dateline', type: 'text' },
+    { name: 'about', type: 'textarea' },
+    { name: 'topic', type: 'select', options: ['ice', 'climate', 'oceans', 'life_in_antarctica', 'stations', 'expeditions'] },
     { name: 'thread', type: 'array', fields: [{ name: 'text', type: 'textarea', required: true }] },
     { name: 'hashtags', type: 'text', hasMany: true },
     {
@@ -64,6 +65,8 @@ export const OutreachPosts: CollectionConfig = {
     { name: 'cited_chunk_ids', type: 'number', hasMany: true, admin: { readOnly: true } },
     // Pass/fail check list for the reviewer (plan §10.3). Never a numeric confidence.
     { name: 'checks', type: 'json', admin: { readOnly: true } },
+    { name: 'check_issues', type: 'text', hasMany: true, admin: { readOnly: true } },
+    { name: 'generation_request_id', type: 'text', index: true, admin: { readOnly: true, position: 'sidebar' }, access: { read: ({ req }) => staffRole(req.user?.role) } },
     { name: 'model', type: 'text', admin: { readOnly: true, position: 'sidebar' } },
     { name: 'prompt_version', type: 'text', admin: { readOnly: true, position: 'sidebar' } },
     // Only reviewers and admins approve (plan §8.2).
@@ -77,6 +80,6 @@ export const OutreachPosts: CollectionConfig = {
     },
     { name: 'reviewed_by', type: 'relationship', relationTo: 'users', access: reviewerOnly, admin: { position: 'sidebar', readOnly: true } },
     { name: 'reviewed_at', type: 'date', access: reviewerOnly, admin: { position: 'sidebar', readOnly: true } },
-    { name: 'review_note', type: 'textarea', admin: { position: 'sidebar' } },
+    { name: 'review_note', type: 'textarea', access: reviewerOnly, admin: { position: 'sidebar' } },
   ],
 }

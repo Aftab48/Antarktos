@@ -5,7 +5,10 @@ import * as migration_20260927_130755_collections from './20260927_130755_collec
 import * as migration_20260927_131000_archive_chunks from './20260927_131000_archive_chunks';
 import * as migration_20260927_150000_chunks_published from './20260927_150000_chunks_published';
 import * as migration_20260927_170000_hindi_search from './20260927_170000_hindi_search';
+import * as migration_20260927_191104_outreach_generation from './20260927_191104_outreach_generation';
 import * as migration_20260928_003000_ask_guard from './20260928_003000_ask_guard';
+
+import * as migration_20260928_010000_generation_log from './20260928_010000_generation_log';
 
 export const migrations = [
   {
@@ -44,8 +47,14 @@ export const migrations = [
     name: '20260927_170000_hindi_search',
   },
   {
+    up: migration_20260927_191104_outreach_generation.up,
+    down: migration_20260927_191104_outreach_generation.down,
+    name: '20260927_191104_outreach_generation',
+  },
+  {
     up: migration_20260928_003000_ask_guard.up,
     down: migration_20260928_003000_ask_guard.down,
-    name: '20260928_003000_ask_guard',
+    name: '20260928_003000_ask_guard'
   },
+  { up: migration_20260928_010000_generation_log.up, down: migration_20260928_010000_generation_log.down, name: '20260928_010000_generation_log' },
 ];

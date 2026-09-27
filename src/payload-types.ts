@@ -449,10 +449,45 @@ export interface OutreachPost {
         relationTo: 'stations';
         value: number | Station;
       };
+  sources?:
+    | (
+        | {
+            relationTo: 'reports';
+            value: number | Report;
+          }
+        | {
+            relationTo: 'datasets';
+            value: number | Dataset;
+          }
+        | {
+            relationTo: 'publications';
+            value: number | Publication;
+          }
+        | {
+            relationTo: 'media';
+            value: number | Media;
+          }
+        | {
+            relationTo: 'events';
+            value: number | Event;
+          }
+        | {
+            relationTo: 'expeditions';
+            value: number | Expedition;
+          }
+        | {
+            relationTo: 'stations';
+            value: number | Station;
+          }
+      )[]
+    | null;
   platform: 'blog' | 'x' | 'instagram' | 'linkedin' | 'press_note' | 'student_explainer';
   language: 'en' | 'hi';
   title?: string | null;
   body: string;
+  dateline?: string | null;
+  about?: string | null;
+  topic?: ('ice' | 'climate' | 'oceans' | 'life_in_antarctica' | 'stations' | 'expeditions') | null;
   thread?:
     | {
         text: string;
@@ -481,6 +516,8 @@ export interface OutreachPost {
     | number
     | boolean
     | null;
+  check_issues?: string[] | null;
+  generation_request_id?: string | null;
   model?: string | null;
   prompt_version?: string | null;
   review_status?: ('pending' | 'approved' | 'rejected') | null;
@@ -868,10 +905,14 @@ export interface EventsSelect<T extends boolean = true> {
  */
 export interface OutreachPostsSelect<T extends boolean = true> {
   source?: T;
+  sources?: T;
   platform?: T;
   language?: T;
   title?: T;
   body?: T;
+  dateline?: T;
+  about?: T;
+  topic?: T;
   thread?:
     | T
     | {
@@ -892,6 +933,8 @@ export interface OutreachPostsSelect<T extends boolean = true> {
   suggested_media?: T;
   cited_chunk_ids?: T;
   checks?: T;
+  check_issues?: T;
+  generation_request_id?: T;
   model?: T;
   prompt_version?: T;
   review_status?: T;
