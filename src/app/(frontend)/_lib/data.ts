@@ -7,7 +7,7 @@ import { connection } from 'next/server'
 import { getPayload, type CollectionSlug, type PaginatedDocs, type Where } from 'payload'
 import { cache } from 'react'
 
-import { isLocale, type Locale } from '@/i18n'
+import { isLocale, pick, type Locale } from '@/i18n'
 
 export type Doc = Record<string, any>
 export type Params<T = object> = Promise<{ lang: string } & T>
@@ -84,16 +84,7 @@ export async function citedPages(collection: string, docId: number, ids: number[
   return new Map(rows.map((r: Doc) => [Number(r.id), r.page == null ? null : Number(r.page)]))
 }
 
-// Localized value in the page's language, else the other one; `lang` says which. Non-localized text counts as English.
-export function pick<T = string>(v: unknown, l: Locale): { value: T; lang: Locale } | null {
-  const has = (x: unknown) => x != null && x !== '' && !(Array.isArray(x) && x.length === 0)
-  if (v && typeof v === 'object' && !Array.isArray(v)) {
-    const o = v as Record<string, unknown>
-    for (const lang of [l, l === 'en' ? 'hi' : 'en'] as const) if (has(o[lang])) return { value: o[lang] as T, lang }
-    return null
-  }
-  return has(v) ? { value: v as T, lang: 'en' } : null
-}
+export { pick } from '@/i18n'
 export const text = (v: unknown, l: Locale) => pick(v, l)?.value ?? ''
 
 // Staff-entered links are shown only when they are http(s).

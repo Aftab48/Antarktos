@@ -3,10 +3,10 @@
 import type { ElementType, ReactNode } from 'react'
 
 import { Badge } from '@/components/ui/badge'
-import { formatDate, formatNumber, href, translator, type Key, type Locale } from '@/i18n'
+import { formatDate, formatNumber, formatYear, href, translator, type Key, type Locale } from '@/i18n'
 import { citedIds, stripMarkers } from '@/pipeline/text'
 
-import { citedPages, pick, rel, safeUrl, text, type Doc, type RecordType } from './data'
+import { citedPages, pick, rel, safeUrl, type Doc, type RecordType } from './data'
 
 // Localized text; marks `lang` when it isn't the page's language (a Hindi page showing English content).
 export function L({ v, l, as: Tag = 'span', className }: { v: unknown; l: Locale; as?: ElementType; className?: string }) {
@@ -57,7 +57,7 @@ export const titleOf = (type: RecordType, doc: Doc) => (type === 'media' ? (pick
 export function whenOf(l: Locale, type: RecordType, doc: Doc) {
   if (type === 'events') return doc.date ? formatDate(l, doc.date) : undefined
   if (type === 'media') return doc.taken_at ? formatDate(l, doc.taken_at) : undefined
-  return doc.year ? String(doc.year) : undefined
+  return doc.year ? formatYear(l, doc.year) : undefined
 }
 
 export function coordinates(l: Locale, lat?: number | null, lng?: number | null) {
@@ -204,6 +204,7 @@ export async function CitedText({ v, l, collection, doc }: { v: unknown; l: Loca
       <sup key={key}>
         <a
           href={page ? `${doc.url}#page=${page}` : doc.url}
+          lang={l}
           aria-label={page ? t('summary.citeLabel', { n, page }) : t('summary.citeLabelNoPage', { n })}
           className="px-0.5 font-medium text-primary underline-offset-2 hover:underline"
         >
@@ -220,7 +221,7 @@ export async function CitedText({ v, l, collection, doc }: { v: unknown; l: Loca
     <div lang={p.lang === l ? undefined : p.lang} className="flex flex-col gap-3">
       {paragraphs}
       {numbers.size > 0 && (
-        <div className="text-sm">
+        <div className="text-sm" lang={l}>
           <h3 className="font-medium">{t('summary.sources')}</h3>
           <ol className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
             {[...numbers].map(([id, n]) => (
@@ -241,20 +242,20 @@ const youtubeId = (url: string) => url.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/
 
 // Full-size photo, video file or YouTube embed for a media record's own page.
 export function MediaPlayer({ m, l }: { m: Doc; l: Locale }) {
-  const alt = text(m.alt, l)
+  const alt = pick(m.alt, l)
   const yt = typeof m.youtube_url === 'string' ? youtubeId(m.youtube_url) : undefined
   if (yt)
     return (
       <div className="aspect-video overflow-hidden rounded-xl bg-muted">
-        <iframe src={`https://www.youtube-nocookie.com/embed/${yt}`} title={alt} allowFullScreen loading="lazy" className="size-full" />
+        <iframe src={`https://www.youtube-nocookie.com/embed/${yt}`} title={alt?.value} lang={alt?.lang} allowFullScreen loading="lazy" className="size-full" />
       </div>
     )
   if (m.url && m.mimeType?.startsWith('video/'))
-    return <video controls preload="metadata" src={m.url} aria-label={alt} className="w-full rounded-xl bg-black" />
+    return <video controls preload="metadata" src={m.url} aria-label={alt?.value} lang={alt?.lang} className="w-full rounded-xl bg-black" />
   return <MediaImage m={m} l={l} sizes="(min-width: 1024px) 48rem, 100vw" eager className="h-auto w-full rounded-xl" />
 }
 
-export const season = (doc: Doc) => (doc.season_start ? `${doc.season_start}${doc.season_end && doc.season_end !== doc.season_start ? `–${doc.season_end}` : ''}` : '')
+export const season = (doc: Doc, l: Locale) => (doc.season_start ? `${formatYear(l, doc.season_start)}${doc.season_end && doc.season_end !== doc.season_start ? `–${formatYear(l, doc.season_end)}` : ''}` : '')
 
 export function ExpeditionList({ docs, l }: { docs: Doc[]; l: Locale }) {
   return (
@@ -265,7 +266,7 @@ export function ExpeditionList({ docs, l }: { docs: Doc[]; l: Locale }) {
             <L v={d.title} l={l} />
           </a>
           <span className="text-sm text-muted-foreground">
-            {[season(d), label(l, 'region', d.region)].filter(Boolean).join(' · ')}
+            {[season(d, l), label(l, 'region', d.region)].filter(Boolean).join(' · ')}
             {d.leader && (
               <>
                 {' · '}
@@ -294,7 +295,7 @@ export function StationCard({ doc, l, compact }: { doc: Doc; l: Locale; compact?
           </a>
         </h3>
         <p className="text-sm text-muted-foreground">
-          {[label(l, 'region', doc.region), label(l, 'status', doc.operational_status), doc.established && `${t('field.established')} ${doc.established}`]
+          {[label(l, 'region', doc.region), label(l, 'status', doc.operational_status), doc.established && t('station.establishedYear', { year: formatYear(l, doc.established) })]
             .filter(Boolean)
             .join(' · ')}
         </p>

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { translator, type Locale } from '@/i18n'
 import { copyText, linkedInIntent, xIntent } from '@/outreach/presentation'
 
-type Post = { id: number; platform: string; title?: string; body: string; hashtags?: string[]; thread?: { text: string }[]; dateline?: string; about?: string; suggested_media?: unknown }
+type Post = { language?: Locale; id: number; platform: string; title?: string; body: string; hashtags?: string[]; thread?: { text: string }[]; dateline?: string; about?: string; suggested_media?: unknown }
 
 export function ShareActions({ post, l }: { post: Post; l: Locale }) {
   const t = translator(l)
@@ -28,6 +28,6 @@ export function ShareActions({ post, l }: { post: Post; l: Locale }) {
     {post.platform === 'linkedin' && <p className="mt-3 text-sm text-muted-foreground">{t('outreach.linkedInHint')}</p>}
     {post.platform === 'x' && !!post.thread?.length && <div className="mt-3 flex flex-wrap gap-3">{post.thread.slice(1).map((item, i) => <a key={i} className="text-sm underline underline-offset-4" href={xIntent(copyText({ body: item.text }))} target="_blank" rel="noopener noreferrer">{t('outreach.shareThread', { n: i + 2 })}</a>)}</div>}
     <p role="status" aria-live="polite" className="mt-2 text-sm">{message}</p>
-    {manualCopy && <label className="mt-2 block text-sm">{t('outreach.copy')}<textarea readOnly value={text} onFocus={(e) => e.target.select()} rows={7} className="mt-2 w-full rounded-lg border bg-background p-3" /></label>}
+    {manualCopy && <label className="mt-2 block text-sm">{t('outreach.copy')}<textarea lang={post.language ?? l} readOnly value={text} onFocus={(e) => e.target.select()} rows={7} className="mt-2 w-full rounded-lg border bg-background p-3" /></label>}
   </section>
 }

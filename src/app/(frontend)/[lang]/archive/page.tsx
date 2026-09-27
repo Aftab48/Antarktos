@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { formatNumber, href, translator } from '@/i18n'
 import { searchArchive } from '@/search/database'
 
-import { find, isRecordType, pageLocale, RECORD_SORT, RECORD_TYPES, REGIONS, text, type Doc, type Params, type RecordType } from '../../_lib/data'
+import { find, isRecordType, pageLocale, RECORD_SORT, RECORD_TYPES, REGIONS, pick, text, type Doc, type Params, type RecordType } from '../../_lib/data'
 import { h1, h2, label, LinkedRecords, RecordGrid } from '../../_lib/ui'
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
@@ -112,7 +112,7 @@ export default async function Archive({ params, searchParams }: { params: Params
             <select name="expedition" defaultValue={f.expedition ?? ''} className={select}>
               <option value="">{t('archive.all')}</option>
               {expeditions.docs.map((d: Doc) => (
-                <option key={d.id} value={d.id}>{text(d.title, l)}</option>
+                <option key={d.id} value={d.id} lang={pick(d.title, l)?.lang}>{text(d.title, l)}</option>
               ))}
             </select>
           </label>
@@ -121,7 +121,7 @@ export default async function Archive({ params, searchParams }: { params: Params
             <select name="station" defaultValue={f.station ?? ''} className={select}>
               <option value="">{t('archive.all')}</option>
               {stations.docs.map((d: Doc) => (
-                <option key={d.id} value={d.id}>{text(d.name, l)}</option>
+                <option key={d.id} value={d.id} lang={pick(d.name, l)?.lang}>{text(d.name, l)}</option>
               ))}
             </select>
           </label>

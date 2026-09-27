@@ -36,6 +36,6 @@ export function ReviewPreview() {
     {[data.title, data.dateline, ...(data.thread?.length ? data.thread.map((p: { text: string }) => p.text) : [data.body]), data.about].filter(Boolean).map((value, i) => <CitationText key={i} text={value} sources={sources} locale={language} />)}
     {Array.isArray(data.quiz) && data.quiz.length > 0 && <><h3>Quiz</h3><ol>{data.quiz.map((q: any, i: number) => <li key={i}><CitationText text={`${q.question} [c:${q.chunk_id}]`} sources={sources} locale={language} /><ol>{q.options?.map((o: string, j: number) => <li key={j}>{o}{j === q.answer_index ? ' (correct answer)' : ''}</li>)}</ol><CitationText text={`${q.explanation ?? ''} [c:${q.chunk_id}]`} sources={sources} locale={language} /></li>)}</ol></>}
     <h3>Sources</h3>
-    {sources.length ? <ol>{sources.map((s) => <li key={s.id}><a href={s.recordUrl}>{s.title}</a>{s.pageUrl && <> · <a href={s.pageUrl}>Page {s.page}</a></>} <small>[c:{s.id}]</small></li>)}</ol> : <p>No readable source citations are available.</p>}
+    {sources.length ? <ol>{sources.map((s) => <li key={s.id}><a href={s.recordUrl} lang={s.titleLocale}>{s.title}</a>{s.pageUrl && <> · <a href={s.pageUrl}>Page {s.page}</a></>} <small>[c:{s.id}]</small></li>)}</ol> : <p>No readable source citations are available.</p>}
   </section>
 }

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatDate, formatNumber, href, translator, type Locale } from '@/i18n'
+import { formatDate, formatNumber, formatYear, href, translator, type Locale } from '@/i18n'
 
 import { findOne, isRecordType, pageLocale, pick, rel, rels, safeUrl, text, type Doc, type Params, type RecordType } from '../../../../_lib/data'
 import {
@@ -134,7 +134,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
         ),
         facts: [
           [t('field.type'), label(l, 'reportType', doc.report_type)],
-          [t('field.year'), doc.year],
+          [t('field.year'), doc.year && formatYear(l, doc.year)],
           [t('field.pages'), doc.page_count && formatNumber(l, doc.page_count)],
           [t('field.file'), megabytes(l, doc.filesize)],
           [t('field.keywords'), en(l, list(doc.keywords))],
@@ -159,7 +159,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           </>
         ),
         facts: [
-          [t('field.year'), doc.year],
+          [t('field.year'), doc.year && formatYear(l, doc.year)],
           [t('field.temporal'), doc.temporal_from && [doc.temporal_from, doc.temporal_to].filter(Boolean).map((d) => formatDate(l, d)).join(' – ')],
           [t('field.bbox'), doc.bbox?.south != null && `${coordinates(l, doc.bbox.south, doc.bbox.west)} – ${coordinates(l, doc.bbox.north, doc.bbox.east)}`],
           [t('field.format'), en(l, doc.format)],
@@ -179,7 +179,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
         facts: [
           [t('field.authors'), en(l, list(doc.authors))],
           [t('field.venue'), en(l, doc.venue)],
-          [t('field.year'), doc.year],
+          [t('field.year'), doc.year && formatYear(l, doc.year)],
           [t('field.doi'), doc.doi && <ExternalLink url={doiUrl(doc.doi)}>{doc.doi}</ExternalLink>],
         ],
         actions: [

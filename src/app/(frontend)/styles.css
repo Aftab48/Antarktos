@@ -99,3 +99,20 @@
     outline-offset: 2px;
   }
 }
+/* Self-hosted OFL font: consistent conjuncts and vowel marks, without a third-party request. */
+@font-face {
+  font-family: "Noto Sans Devanagari";
+  src: url("/fonts/NotoSansDevanagari.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:lang(hi) {
+  font-family: "Noto Sans Devanagari", "Nirmala UI", sans-serif;
+  letter-spacing: normal;
+}
+
+:where(h1, h2, h3, p, label, legend, button, a, input, textarea, select):lang(hi) {
+  line-height: 1.65;
+}

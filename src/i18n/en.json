@@ -204,5 +204,6 @@
   "topic.oceans": "Oceans",
   "topic.life_in_antarctica": "Life in Antarctica",
   "topic.stations": "Research stations",
-  "topic.expeditions": "Expeditions"
+  "topic.expeditions": "Expeditions",
+  "station.establishedYear": "Established {year}"
 }

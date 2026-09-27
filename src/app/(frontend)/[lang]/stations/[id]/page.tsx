@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { href, translator } from '@/i18n'
+import { formatYear, href, translator } from '@/i18n'
 
 import { find, findOne, linkedRecords, pageLocale, rel, text, type Params } from '../../../_lib/data'
 import { coordinates, ExpeditionList, FallbackNote, Facts, fallsBack, h1, h2, L, label, LinkedRecords, MediaImage, Paragraphs, provenanceFacts } from '../../../_lib/ui'
@@ -44,8 +44,8 @@ export default async function Station({ params }: { params: P }) {
             items={[
               [t('field.region'), label(l, 'region', doc.region)],
               [t('field.status'), label(l, 'status', doc.operational_status)],
-              [t('field.established'), doc.established],
-              [t('field.closed'), doc.decommissioned],
+              [t('field.established'), doc.established && formatYear(l, doc.established)],
+              [t('field.closed'), doc.decommissioned && formatYear(l, doc.decommissioned)],
               [t('field.coordinates'), coordinates(l, doc.lat, doc.lng)],
               ...provenanceFacts(l, doc),
             ]}

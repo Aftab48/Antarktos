@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { formatNumber, translator } from '@/i18n'
+import { formatNumber, formatYear, translator } from '@/i18n'
 
 import { find, pageLocale, REGIONS, type Doc, type Params } from '../../_lib/data'
 import { ExpeditionList, h1, label } from '../../_lib/ui'
@@ -18,7 +18,7 @@ export default async function Expeditions({ params }: { params: Params }) {
     const docs = all.filter((d) => d.region === region)
     const decades = new Map<string, Doc[]>()
     for (const d of docs) {
-      const key = d.season_start ? t('expeditions.decade', { decade: Math.floor(d.season_start / 10) * 10 }) : t('expeditions.noSeason')
+      const key = d.season_start ? t('expeditions.decade', { decade: formatYear(l, Math.floor(d.season_start / 10) * 10) }) : t('expeditions.noSeason')
       decades.set(key, [...(decades.get(key) ?? []), d])
     }
     return { region, count: docs.length, decades: [...decades] }

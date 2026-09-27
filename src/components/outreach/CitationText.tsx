@@ -2,14 +2,14 @@ import type { ReactNode } from 'react'
 import { citationParts, type CitationSource } from '../../outreach/presentation'
 import { formatNumber, translator, type Locale } from '../../i18n'
 
-export function CitationText({ text, sources, locale, publicStyle = false }: { text: string; sources: CitationSource[]; locale: Locale; publicStyle?: boolean }) {
-  const t = translator(locale)
+export function CitationText({ text, sources, locale, uiLocale = locale, publicStyle = false }: { text: string; sources: CitationSource[]; locale: Locale; uiLocale?: Locale; publicStyle?: boolean }) {
+  const t = translator(uiLocale)
   const inline = (value: string): ReactNode => citationParts(value).map((part, index) => {
     if ('text' in part) return part.text
     const source = sources.find((s) => s.id === part.id)
     if (!source) return null
     const n = sources.indexOf(source) + 1
-    return <sup key={index}><a href={source.pageUrl ?? source.recordUrl} aria-label={source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })} style={{ padding: '0 0.15rem', textDecoration: 'underline' }}>[{formatNumber(locale, n)}]</a></sup>
+    return <sup key={index}><a href={source.pageUrl ?? source.recordUrl} lang={uiLocale} aria-label={source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })} style={{ padding: '0 0.15rem', textDecoration: 'underline' }}>[{formatNumber(uiLocale, n)}]</a></sup>
   })
   return <div lang={locale} className={publicStyle ? 'space-y-4 leading-relaxed break-words' : undefined}>
     {text.split(/\n\s*\n/).map((paragraph, i) => {

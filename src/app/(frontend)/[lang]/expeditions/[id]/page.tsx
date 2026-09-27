@@ -30,7 +30,7 @@ export default async function Expedition({ params }: { params: P }) {
         {t('nav.expeditions')}
       </a>
       <L v={doc.title} l={l} as="h1" className={`${h1} mt-2`} />
-      <p className="mt-2 text-muted-foreground">{[label(l, 'region', doc.region), season(doc)].filter(Boolean).join(' · ')}</p>
+      <p className="mt-2 text-muted-foreground">{[label(l, 'region', doc.region), season(doc, l)].filter(Boolean).join(' · ')}</p>
       <div className="mt-6">{fallsBack(l, doc.title, doc.summary, doc.highlights) && <FallbackNote l={l} />}</div>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
@@ -51,7 +51,7 @@ export default async function Expedition({ params }: { params: P }) {
         <aside>
           <Facts
             items={[
-              [t('field.season'), season(doc)],
+              [t('field.season'), season(doc, l)],
               [t('field.leader'), en(l, doc.leader)],
               [t('field.region'), label(l, 'region', doc.region)],
               [

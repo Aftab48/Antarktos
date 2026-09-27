@@ -58,7 +58,7 @@ export default async function Home({ params }: { params: Params }) {
         <section aria-labelledby="featured">
           <h2 id="featured" className={h2}>{t('home.featured')}</h2>
           <article className="rounded-xl border p-6">
-            <p className="text-sm text-muted-foreground">{[label(l, 'region', featured.region), season(featured)].filter(Boolean).join(' · ')}</p>
+            <p className="text-sm text-muted-foreground">{[label(l, 'region', featured.region), season(featured, l)].filter(Boolean).join(' · ')}</p>
             <h3 className="mt-1 text-2xl font-semibold">
               <a href={href(l, `/expeditions/${featured.id}`)} className="underline-offset-4 hover:underline">
                 <L v={featured.title} l={l} />

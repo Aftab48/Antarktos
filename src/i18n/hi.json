@@ -204,5 +204,6 @@
   "topic.oceans": "महासागर",
   "topic.life_in_antarctica": "अंटार्कटिका में जीवन",
   "topic.stations": "अनुसंधान स्टेशन",
-  "topic.expeditions": "अभियान"
+  "topic.expeditions": "अभियान",
+  "station.establishedYear": "स्थापना {year}"
 }

@@ -1,7 +1,7 @@
 // Shared presentation logic contains no server secrets and makes no provider calls.
 export const TOPICS = ['ice', 'climate', 'oceans', 'life_in_antarctica', 'stations', 'expeditions'] as const
 export const PLATFORMS = ['blog', 'x', 'instagram', 'linkedin', 'press_note', 'student_explainer'] as const
-export type CitationSource = { id: number; title: string; recordUrl: string; page: number | null; pageUrl?: string }
+export type CitationSource = { id: number; title: string; titleLocale?: 'en' | 'hi'; recordUrl: string; page: number | null; pageUrl?: string }
 export type QuizItem = { question: string; options: string[]; answer_index: number; explanation?: string | null; chunk_id?: number | null }
 
 export function validQuiz(items: unknown): QuizItem[] {

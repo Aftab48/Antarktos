@@ -1,6 +1,6 @@
 import { sql } from '@payloadcms/db-postgres'
 import type { Payload, TypedUser } from 'payload'
-import { href, type Locale } from '../i18n'
+import { href, pick, translator, type Key, type Locale } from '../i18n'
 import { sourceRecordPath, type CitationSource } from './presentation'
 
 const collections = ['reports', 'datasets', 'publications', 'media', 'events', 'stations', 'expeditions'] as const
@@ -27,15 +27,16 @@ export async function outreachCitations(payload: Payload, post: Post, locale: Lo
     const key = `${collection}:${row.doc_id}`
     if (!collections.includes(collection) || !allowed.has(key)) continue
     if (!docs.has(key)) {
-      const found = await payload.find({ collection, where: { id: { equals: Number(row.doc_id) } }, limit: 1, depth: 0, locale, draft: Boolean(user), overrideAccess: false, user })
+      const found = await payload.find({ collection, where: { id: { equals: Number(row.doc_id) } }, limit: 1, depth: 0, locale: 'all', draft: Boolean(user), overrideAccess: false, user })
       docs.set(key, found.docs[0] ?? null)
     }
     const doc = docs.get(key)
     if (!doc) continue
-    const title = doc.title || doc.name || doc.caption || doc.alt || `${collection} ${doc.id}`
+    const title = [doc.title, doc.name, doc.caption, doc.alt].map((value) => pick(value, locale)).find(Boolean)
+      ?? { value: translator(locale)(`type.${collection}` as Key), lang: locale }
     const page = row.page == null ? null : Number(row.page)
     const url = typeof doc.url === 'string' && /^https?:\/\//.test(doc.url) ? doc.url : undefined
-    result.push({ id: Number(row.id), title: String(title), page, recordUrl: user ? `/admin/collections/${collection}/${doc.id}` : href(locale, sourceRecordPath(collection, doc.id)), ...(page && url ? { pageUrl: `${url}#page=${page}` } : {}) })
+    result.push({ id: Number(row.id), title: String(title.value), titleLocale: title.lang, page, recordUrl: user ? `/admin/collections/${collection}/${doc.id}` : href(locale, sourceRecordPath(collection, doc.id)), ...(page && url ? { pageUrl: `${url}#page=${page}` } : {}) })
   }
   return result
 }
