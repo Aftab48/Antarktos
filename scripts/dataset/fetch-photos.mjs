@@ -1,5 +1,6 @@
 // Fetch openly licensed polar photos from Wikimedia Commons for the demo archive.
 // Node only, no new dependencies. Polite: batched imageinfo calls + delays between requests.
+import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import {
@@ -110,6 +111,12 @@ async function collectForQuery(query, outRoot) {
 
 async function main() {
   const outRoot = path.resolve('data/photos')
+  // A re-run would re-download the photos moved to data/photos-rejected and overwrite the curated manifest,
+  // including the rows fetch-category-photos appended (their files would stay, without a license row).
+  if (existsSync(path.join(outRoot, 'manifest.csv'))) {
+    console.error(`${outRoot} is already collected. To start over, move it away first; to add photos, use fetch-category-photos.mjs.`)
+    process.exit(1)
+  }
   await mkdir(outRoot, { recursive: true })
 
   const allRows = []

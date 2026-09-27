@@ -141,7 +141,9 @@ try {
     assert.equal(hi.title, 'चरण 2 जाँच रिपोर्ट')
   })
 
-  await step('an editor draft over the published report stays private', async () => {
+  await step('an editor draft over the published report stays private; a non-draft editor save is refused', async () => {
+    // Without draft or _status the save would keep `published` and change the live report unreviewed.
+    await rejects(payload.update({ collection: 'reports', id: reportId, data: { title: `${TITLE} (live edit)` }, ...as(editor) }), [403])
     await payload.update({ collection: 'reports', id: reportId, data: { title: `${TITLE} (edited)` }, draft: true, ...as(editor) })
     assert.equal((await payload.findByID({ collection: 'reports', id: reportId, ...anon })).title, TITLE)
     assert.equal((await payload.findByID({ collection: 'reports', id: reportId, draft: true, ...as(editor) })).title, `${TITLE} (edited)`)
@@ -218,7 +220,7 @@ try {
     )
   })
 
-  await step('archive_chunks: generated tsvector column + GIN index, english and simple configs', async () => {
+  await step('archive_chunks: generated tsvector column + GIN index, english and hindi configs', async () => {
     const q = async (query: ReturnType<typeof sql>) => (await payload.db.drizzle.execute(query)).rows as any[]
     const [col] = await q(sql`select attgenerated from pg_attribute where attrelid = 'archive_chunks'::regclass and attname = 'tsv'`)
     assert.equal(col.attgenerated, 's')

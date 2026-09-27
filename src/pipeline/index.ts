@@ -164,26 +164,16 @@ export async function processRecord(payload: Payload, collection: string, id: nu
         result.chunks += rows.length
       }
 
-      // English summary from the chunks; the Hindi summary is a translation of the English one,
-      // whether the English was AI-written or staff-written.
-      if (collection === 'reports' && state === 'ready') {
-        let summaryEn = first(doc.summary, 'en')
-        if (!summaryEn) {
-          const chunks = await pageChunks(payload, collection, id)
-          if (chunks.length) {
-            const meta = metadataLines([['Title', first(doc.title, 'en')], ['Report type', doc.report_type], ['Year', doc.year], ['Region', doc.region]])
-            const call = await summarize(meta, chunks)
-            result.llm.push({ step: 'summary', model: call.model, attempts: call.attempts, costUsd: call.costUsd, raw: call.raw })
-            result.dropped = call.out.dropped
-            en.summary = summaryEn = call.out.summary_en
-            if (!doc.keywords?.length) en.keywords = call.out.keywords
-            aiFilled = true
-          }
-        }
-        if (summaryEn && !first(doc.summary, 'hi')) {
-          const call = await translateSummary(summaryEn)
-          result.llm.push({ step: 'summary_hi', model: call.model, attempts: call.attempts, costUsd: call.costUsd, raw: call.raw })
-          hi.summary = call.out
+      // English summary from the chunks (the Hindi translation runs after the English is saved, below).
+      if (collection === 'reports' && state === 'ready' && !first(doc.summary, 'en')) {
+        const chunks = await pageChunks(payload, collection, id)
+        if (chunks.length) {
+          const meta = metadataLines([['Title', first(doc.title, 'en')], ['Report type', doc.report_type], ['Year', doc.year], ['Region', doc.region]])
+          const call = await summarize(meta, chunks)
+          result.llm.push({ step: 'summary', model: call.model, attempts: call.attempts, costUsd: call.costUsd, raw: call.raw })
+          result.dropped = call.out.dropped
+          en.summary = call.out.summary_en
+          if (!doc.keywords?.length) en.keywords = call.out.keywords
           aiFilled = true
         }
       }
@@ -217,6 +207,16 @@ export async function processRecord(payload: Payload, collection: string, id: nu
 
       if (aiFilled && 'ai_generated' in doc) en.ai_generated = true
       if (Object.keys(en).length) await save(payload, collection, id, 'en', en)
+
+      // The Hindi summary is a translation of the English one, AI-written or staff-written. It runs after the
+      // English is saved, so a failed translation doesn't throw away a paid-for summary: a re-run only translates.
+      const summaryEn = collection === 'reports' && state === 'ready' ? (en.summary ?? first(doc.summary, 'en')) : ''
+      if (summaryEn && !first(doc.summary, 'hi')) {
+        const call = await translateSummary(summaryEn)
+        result.llm.push({ step: 'summary_hi', model: call.model, attempts: call.attempts, costUsd: call.costUsd, raw: call.raw })
+        hi.summary = call.out
+        if ('ai_generated' in doc) hi.ai_generated = true // not localized: shared by both locales
+      }
       if (Object.keys(hi).length) await save(payload, collection, id, 'hi', hi)
       if (Object.keys(en).length || Object.keys(hi).length) doc = await read(payload, collection, id)
     }

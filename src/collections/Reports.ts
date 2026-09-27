@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { contentAccess } from '../access'
+import { contentAccess, onlyPublishersPublish } from '../access'
 import { guardPipelineFields, removeChunks, startProcessing } from '../pipeline'
 import { checkUpload } from '../storage'
 import { aiGenerated, expedition, processing, provenance, region, stations, year } from './fields'
@@ -11,7 +11,7 @@ export const Reports: CollectionConfig = {
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'report_type', 'year', '_status', 'processing_state'] },
   access: contentAccess,
   versions: { drafts: true },
-  hooks: { beforeChange: [checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },
+  hooks: { beforeChange: [onlyPublishersPublish, checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },
   upload: { mimeTypes: ['application/pdf'] },
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },

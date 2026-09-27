@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { canPublishField, contentAccess } from '../access'
+import { canPublishField, contentAccess, onlyPublishersPublish } from '../access'
 
 const reviewerOnly = { create: canPublishField, update: canPublishField }
 
@@ -13,6 +13,7 @@ export const OutreachPosts: CollectionConfig = {
   versions: { drafts: true },
   hooks: {
     beforeChange: [
+      onlyPublishersPublish,
       // Stamp who reviewed and when, whenever the review decision changes.
       ({ data, originalDoc, req }) => {
         if (req.user && data.review_status && data.review_status !== (originalDoc?.review_status ?? 'pending')) {

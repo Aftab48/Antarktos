@@ -30,7 +30,7 @@ async function namesUnder(dir) {
 async function main() {
   const root = path.resolve('data/photos')
   const known = new Set([...(await namesUnder(root)), ...(await namesUnder(path.resolve('data/photos-rejected')))])
-  const rows = []
+  let added = 0
   for (const [category, slug] of Object.entries(CATEGORIES)) {
     const titles = (await categoryFiles(category)).filter((t) => !known.has(t.replace(/^File:/, '')))
     await sleep(API_DELAY_MS)
@@ -44,14 +44,23 @@ async function main() {
         const license = classifyLicense(info.extmetadata?.LicenseShortName?.value)
         if (!PHOTO_MIME.has(info.mime ?? '') || !license) { skipped++; continue }
         const filename = title.replace(/^File:/, '')
-        const res = await fetchWithRetry(info.url, { headers: { 'User-Agent': USER_AGENT } })
-        if (!res.ok) { skipped++; continue }
-        await writeFile(path.join(dir, filename), Buffer.from(await res.arrayBuffer()))
+        try {
+          const res = await fetchWithRetry(info.url, { headers: { 'User-Agent': USER_AGENT } })
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          await writeFile(path.join(dir, filename), Buffer.from(await res.arrayBuffer()))
+        } catch (err) {
+          console.warn(`  skip ${filename}: ${err.message}`)
+          skipped++
+          continue
+        }
         await sleep(DOWNLOAD_DELAY_MS)
         known.add(filename)
         kept++
+        added++
         const creator = stripHtml(info.extmetadata?.Artist?.value)
-        rows.push({
+        // Row written right after its file: a crash later can't leave a kept file without its license row
+        // (a re-run skips files already on disk, so it would never get one).
+        await appendCsv(path.join(root, 'manifest.csv'), HEADERS, [{
           file: `${slug}/${filename}`,
           query: category,
           source_url: info.descriptionurl ?? '',
@@ -60,13 +69,12 @@ async function main() {
           attribution: stripHtml(info.extmetadata?.Credit?.value) || creator,
           taken_at: stripHtml(info.extmetadata?.DateTimeOriginal?.value ?? info.extmetadata?.DateTime?.value),
           has_gps: hasGps(info) ? 'true' : 'false',
-        })
+        }])
       }
     }
-    console.log(`${category}: added ${kept}, skipped ${skipped} (non-photo or license)`)
+    console.log(`${category}: added ${kept}, skipped ${skipped} (non-photo, license or download error)`)
   }
-  await appendCsv(path.join(root, 'manifest.csv'), HEADERS, rows)
-  console.log(`Total added: ${rows.length}`)
+  console.log(`Total added: ${added}`)
 }
 
 main().catch((err) => {

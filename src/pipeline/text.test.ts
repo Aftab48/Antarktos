@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
 import { parseCaption, parseSummary, parseTranslation } from './ai'
-import { guardPipelineFields } from './index'
+import { guardPipelineFields, processRecord } from './index'
 import { chunkPages, cleanPages, groundText, needsOcr } from './text'
 
 const words = (n: number, w = 'ice') => Array.from({ length: n }, () => w).join(' ')
@@ -84,4 +84,40 @@ test('staff saves keep pipeline fields; a stale form cannot wipe AI output; a re
   assert.equal(run({ summary: 'x' }, original, { pipeline: true }).processing_state, undefined)
   const created = guardPipelineFields({ data: { processing_state: 'ready' }, operation: 'create', context: {} } as never) as Record<string, unknown>
   assert.equal(created.processing_state, 'queued')
+})
+
+test('a failed Hindi translation keeps the English summary; the re-run only translates', async () => {
+  // Canned OpenRouter replies (no network) and a stand-in for Payload: every SQL call returns one page chunk.
+  process.env.OPENROUTER_API_KEY ||= 'test'
+  process.env.LLM_MODEL_TEXT ||= 'test/model'
+  const replies: string[] = []
+  globalThis.fetch = (async () => {
+    const content = replies.shift()
+    assert.ok(content, 'unexpected LLM call')
+    return new Response(JSON.stringify({ id: 'x', object: 'chat.completion', created: 0, model: 'test/model', choices: [{ index: 0, finish_reason: 'stop', message: { role: 'assistant', content } }] }), {
+      headers: { 'content-type': 'application/json' },
+    })
+  }) as typeof fetch
+  const saved: { locale: string; data: Record<string, unknown> }[] = []
+  let doc: Record<string, any> = { id: 1, title: { en: 'Report' }, summary: {}, keywords: [], ai_generated: false, _status: 'draft' }
+  const payload = {
+    db: { drizzle: { execute: async () => ({ rows: [{ id: 1, page: 1, text: 'NCPOR invites proposals for the 43rd expedition.' }] }) } },
+    findByID: async () => doc,
+    update: async ({ locale, data }: { locale: string; data: Record<string, unknown> }) => saved.push({ locale, data }),
+  } as never
+
+  const summary = 'NCPOR invites proposals for the 43rd expedition [c:1].'
+  replies.push(JSON.stringify({ summary_en: summary, keywords: ['antarctica'] }), '{"summary_hi":"not Hindi [c:1]."}', '{"summary_hi":"still not Hindi [c:1]."}')
+  const failed = await processRecord(payload, 'reports', 1)
+  assert.equal(failed.state, 'failed')
+  assert.match(failed.error ?? '', /not in Hindi/)
+  assert.deepEqual(saved, [{ locale: 'en', data: { summary, keywords: ['antarctica'], ai_generated: true } }])
+
+  doc = { ...doc, summary: { en: summary }, keywords: ['antarctica'], ai_generated: true }
+  saved.length = 0
+  replies.push(JSON.stringify({ summary_hi: 'एनसीपीओआर 43वें अभियान के लिए प्रस्ताव आमंत्रित करता है [c:1]।' }))
+  const rerun = await processRecord(payload, 'reports', 1)
+  assert.equal(rerun.state, 'ready')
+  assert.deepEqual(rerun.llm.map((c) => c.step), ['summary_hi'])
+  assert.deepEqual(saved.map((s) => [s.locale, Object.keys(s.data)]), [['hi', ['summary', 'ai_generated']]])
 })

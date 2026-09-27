@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { contentAccess } from '../access'
+import { contentAccess, onlyPublishersPublish } from '../access'
 import { removeChunks, startProcessing } from '../pipeline'
 import { provenance, region } from './fields'
 
@@ -10,7 +10,7 @@ export const Stations: CollectionConfig = {
   access: contentAccess,
   versions: { drafts: true },
   // Indexed for search as one chunk per locale (plan §7, §11).
-  hooks: { afterChange: [startProcessing], afterDelete: [removeChunks] },
+  hooks: { beforeChange: [onlyPublishersPublish], afterChange: [startProcessing], afterDelete: [removeChunks] },
   fields: [
     { name: 'name', type: 'text', localized: true, required: true },
     { ...region, required: true },

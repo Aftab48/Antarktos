@@ -7,7 +7,11 @@ import type { ChatCompletionMessageParam } from 'openai/resources/chat/completio
 import { citedIds, devanagariShare, groundText, numbersIn, parseJsonObject } from './text'
 
 let client: OpenAI | undefined
-const llm = () => (client ??= new OpenAI({ apiKey: process.env.OPENROUTER_API_KEY, baseURL: 'https://openrouter.ai/api/v1' }))
+// The SDK defaults (10 min timeout, 2 retries) outlast Vercel's 300 s function limit: one stalled call would get the
+// function killed and leave the record in `processing` with no error. With these it ends as `failed` with a reason.
+// ponytail: per call, not per job; two stalls in one report job can still pass 300 s (pipeline:stuck lists it).
+const llm = () =>
+  (client ??= new OpenAI({ apiKey: process.env.OPENROUTER_API_KEY, baseURL: 'https://openrouter.ai/api/v1', timeout: 120_000, maxRetries: 1 }))
 
 export type LlmCall<T> = { out: T; model: string; raw: string; attempts: number; costUsd?: number }
 
