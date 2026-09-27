@@ -205,5 +205,13 @@
   "topic.life_in_antarctica": "Life in Antarctica",
   "topic.stations": "Research stations",
   "topic.expeditions": "Expeditions",
-  "station.establishedYear": "Established {year}"
+  "station.establishedYear": "Established {year}",
+  "stations.mapTitle": "Research stations on the map",
+  "stations.mapHelp": "Use the arrow keys to pan and the zoom buttons to change scale. Select a marker to open its station link.",
+  "stations.viewList": "View the station list",
+  "stations.mapLoading": "Loading the station map…",
+  "stations.mapError": "The map could not load. Use the station list below.",
+  "stations.mapEmpty": "No published station coordinates are available yet.",
+  "stations.zoomIn": "Zoom in",
+  "stations.zoomOut": "Zoom out"
 }

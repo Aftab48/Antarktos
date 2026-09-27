@@ -118,6 +118,13 @@ input:not([type="checkbox"]):not([type="radio"]), textarea, select {
   letter-spacing: normal;
 }
 
+.station-map-pin { border: 3px solid white; border-radius: 50%; background: #075569; box-shadow: 0 0 0 2px #12384b; }
+.station-map { font: inherit; }
+.station-map .leaflet-popup-content { font: inherit; line-height: 1.65; }
+.station-map .leaflet-popup-content a { color: #075569; }
+.station-map .leaflet-control-attribution { background: white; color: #253a47; }
+.station-map .leaflet-control-attribution a { color: #075569; }
+
 :where(h1, h2, h3, p, label, legend, button, a, input, textarea, select):lang(hi) {
   line-height: 1.65;
 }

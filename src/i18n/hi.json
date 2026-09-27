@@ -205,5 +205,13 @@
   "topic.life_in_antarctica": "अंटार्कटिका में जीवन",
   "topic.stations": "अनुसंधान स्टेशन",
   "topic.expeditions": "अभियान",
-  "station.establishedYear": "स्थापना {year}"
+  "station.establishedYear": "स्थापना {year}",
+  "stations.mapTitle": "मानचित्र पर अनुसंधान केंद्र",
+  "stations.mapHelp": "मानचित्र को खिसकाने के लिए तीर कुंजियों और आकार बदलने के लिए ज़ूम बटन का उपयोग करें। केंद्र का लिंक खोलने के लिए उसका चिह्न चुनें।",
+  "stations.viewList": "केंद्रों की सूची देखें",
+  "stations.mapLoading": "केंद्रों का मानचित्र लोड हो रहा है…",
+  "stations.mapError": "मानचित्र लोड नहीं हो सका। नीचे केंद्रों की सूची देखें।",
+  "stations.mapEmpty": "अभी किसी प्रकाशित केंद्र के निर्देशांक उपलब्ध नहीं हैं।",
+  "stations.zoomIn": "बड़ा करें",
+  "stations.zoomOut": "छोटा करें"
 }
