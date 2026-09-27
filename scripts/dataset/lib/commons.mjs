@@ -43,6 +43,17 @@ export async function searchFiles(query, limit = 50) {
   return (data.query?.search ?? []).map((r) => r.title)
 }
 
+/** Files in a Commons category, plus files of its direct subcategories (one level). Returns "File:..." titles. */
+export async function categoryFiles(category, limit = 200) {
+  const members = async (title, cmtype) => {
+    const data = await apiGet({ action: 'query', list: 'categorymembers', cmtitle: title, cmtype, cmlimit: String(limit), format: 'json' })
+    return (data.query?.categorymembers ?? []).map((m) => m.title)
+  }
+  const files = await members(category, 'file')
+  for (const sub of await members(category, 'subcat')) files.push(...(await members(sub, 'file')))
+  return [...new Set(files)]
+}
+
 /** Fetch imageinfo (url, license metadata, EXIF-ish metadata) for up to ~50 titles at once. */
 export async function getImageInfo(titles) {
   if (titles.length === 0) return []
