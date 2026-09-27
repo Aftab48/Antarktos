@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { contentAccess } from '../access'
+import { guardPipelineFields, removeChunks, startProcessing } from '../pipeline'
 import { checkUpload } from '../storage'
 import { aiGenerated, expedition, processing, provenance, region, stations } from './fields'
 
@@ -10,7 +11,7 @@ export const Media: CollectionConfig = {
   admin: { useAsTitle: 'filename', defaultColumns: ['filename', 'alt', '_status', 'processing_state'] },
   access: contentAccess,
   versions: { drafts: true },
-  hooks: { beforeChange: [checkUpload] },
+  hooks: { beforeChange: [checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },
   upload: {
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'],
     // A media record can be just a YouTube link.

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { contentAccess } from '../access'
+import { removeChunks, startProcessing } from '../pipeline'
 import { provenance, region } from './fields'
 
 export const Expeditions: CollectionConfig = {
@@ -8,6 +9,8 @@ export const Expeditions: CollectionConfig = {
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'region', 'season_start', '_status'] },
   access: contentAccess,
   versions: { drafts: true },
+  // Indexed for search as one chunk per locale (plan §7, §11).
+  hooks: { afterChange: [startProcessing], afterDelete: [removeChunks] },
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },
     { name: 'number', type: 'text' },

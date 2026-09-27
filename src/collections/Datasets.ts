@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { contentAccess } from '../access'
+import { guardPipelineFields, removeChunks, startProcessing } from '../pipeline'
 import { checkUpload } from '../storage'
 import { expedition, processing, provenance, region, stations, year } from './fields'
 
@@ -11,7 +12,7 @@ export const Datasets: CollectionConfig = {
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'format', 'year', '_status'] },
   access: contentAccess,
   versions: { drafts: true },
-  hooks: { beforeChange: [checkUpload] },
+  hooks: { beforeChange: [checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },
   upload: {
     mimeTypes: [
       'text/csv',

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { contentAccess } from '../access'
+import { guardPipelineFields, removeChunks, startProcessing } from '../pipeline'
 import { expedition, processing, provenance, region, stations } from './fields'
 
 // Institutional activities (plan §9).
@@ -9,6 +10,7 @@ export const Events: CollectionConfig = {
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'date', 'event_type', '_status'] },
   access: contentAccess,
   versions: { drafts: true },
+  hooks: { beforeChange: [guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },
     { name: 'date', type: 'date' },
