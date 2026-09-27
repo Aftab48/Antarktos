@@ -12,12 +12,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return { title: { template: `%s | ${t('site.name')}`, default: t('site.name') }, description: t('site.tagline'), icons: '/icon.svg' }
 }
 
-// Next steps add their pages here: /ask (step 6), /news and /learn (step 8).
+// Next steps add /news and /learn (step 8).
 const NAV: [string, Key][] = [
   ['/', 'nav.home'],
   ['/expeditions', 'nav.expeditions'],
   ['/stations', 'nav.stations'],
   ['/archive', 'nav.archive'],
+  ['/ask', 'nav.ask'],
   ['/about', 'nav.about'],
 ]
 
