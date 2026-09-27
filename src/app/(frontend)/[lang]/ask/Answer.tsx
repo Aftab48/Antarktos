@@ -13,7 +13,7 @@ export function Answer({ answer, locale }: { answer: AskAnswer; locale: Locale }
           const id = part.slice(3, -1)
           const sourceIndex = answer.sources.findIndex((source) => source.chunkId === id)
           if (sourceIndex === -1) return null
-          return <a key={partIndex} href={`#source-${id}`} lang={locale} aria-label={t('ask.citation', { n: formatNumber(locale, sourceIndex + 1) })} className="mx-0.5 rounded-sm font-medium text-primary underline underline-offset-4">[{formatNumber(locale, sourceIndex + 1)}]</a>
+          return <a key={partIndex} href={`#source-${id}`} lang={locale} aria-label={t('ask.citation', { n: formatNumber(locale, sourceIndex + 1) })} className="citation-link">[{formatNumber(locale, sourceIndex + 1)}]</a>
         })}</p>)}
       </div>
       <h3 className="mt-8 text-lg font-semibold">{t('ask.sources')}</h3>

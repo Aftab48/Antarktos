@@ -128,7 +128,7 @@ export function provenanceFacts(l: Locale, doc: Doc): [string, ReactNode][] {
 export function RecordCard({ type, doc, l }: { type: RecordType; doc: Doc; l: Locale }) {
   const excerpt = pick(type === 'reports' ? doc.summary : type === 'events' ? doc.description : type === 'media' ? null : doc.abstract, l)
   return (
-    <article className="relative flex flex-col gap-2 overflow-hidden rounded-xl border bg-card p-4 transition-colors focus-within:ring-2 focus-within:ring-ring hover:bg-muted/40">
+    <article className="portal-card relative flex flex-col gap-2 overflow-hidden rounded-xl border bg-card p-4 transition-colors focus-within:ring-2 focus-within:ring-ring hover:bg-muted/40">
       {type === 'media' && (
         <MediaImage m={doc} l={l} sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 90vw" className="-mx-4 -mt-4 mb-1 aspect-[3/2] w-[calc(100%+2rem)] max-w-none object-cover" />
       )}
@@ -166,7 +166,7 @@ export function RecordGrid({ type, docs, l }: { type: RecordType; docs: Doc[]; l
 export function LinkedRecords({ groups, l, archiveQuery, empty }: { groups: { type: RecordType; docs: Doc[]; total: number }[]; l: Locale; archiveQuery: string; empty: string }) {
   const t = translator(l)
   const shown = groups.filter((g) => g.docs.length)
-  if (!shown.length) return <p className="text-muted-foreground">{empty}</p>
+  if (!shown.length) return <p className="portal-empty">{empty}</p>
   return (
     <div className="flex flex-col gap-8">
       {shown.map(({ type, docs, total }) => (
@@ -207,7 +207,7 @@ export async function CitedText({ v, l, collection, doc }: { v: unknown; l: Loca
           href={page ? `${doc.url}#page=${page}` : doc.url}
           lang={l}
           aria-label={page ? t('summary.citeLabel', { n, page }) : t('summary.citeLabelNoPage', { n })}
-          className="px-0.5 font-medium text-primary underline-offset-2 hover:underline"
+          className="citation-link px-0.5 font-medium text-primary underline-offset-2 hover:underline"
         >
           [{formatNumber(l, n)}]
         </a>
@@ -222,7 +222,7 @@ export async function CitedText({ v, l, collection, doc }: { v: unknown; l: Loca
     <div lang={p.lang === l ? undefined : p.lang} className="flex flex-col gap-3">
       {paragraphs}
       {numbers.size > 0 && (
-        <div className="text-sm" lang={l}>
+        <div className="portal-sources text-sm" lang={l}>
           <h3 className="font-medium">{t('summary.sources')}</h3>
           <ol className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
             {[...numbers].map(([id, n]) => (
@@ -260,7 +260,7 @@ export const season = (doc: Doc, l: Locale) => (doc.season_start ? `${formatYear
 
 export function ExpeditionList({ docs, l }: { docs: Doc[]; l: Locale }) {
   return (
-    <ol className="flex flex-col gap-3">
+    <ol className="portal-expeditions flex flex-col gap-3">
       {docs.map((d) => (
         <li key={d.id} className="flex flex-col">
           <a href={href(l, `/expeditions/${d.id}`)} className="font-medium underline-offset-4 hover:underline">
@@ -285,7 +285,7 @@ export function StationCard({ doc, l, compact }: { doc: Doc; l: Locale; compact?
   const t = translator(l)
   const cover = rel(doc.cover)
   return (
-    <article className="relative flex gap-4 overflow-hidden rounded-xl border bg-card p-4 transition-colors focus-within:ring-2 focus-within:ring-ring hover:bg-muted/40">
+    <article className="portal-card relative flex gap-4 overflow-hidden rounded-xl border bg-card p-4 transition-colors focus-within:ring-2 focus-within:ring-ring hover:bg-muted/40">
       {!compact && cover && (
         <MediaImage m={cover} l={l} sizes="8rem" className="size-24 shrink-0 rounded-lg object-cover sm:size-32" />
       )}

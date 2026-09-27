@@ -31,11 +31,14 @@ const r2Collection = {
 export default buildConfig({
   admin: {
     user: Users.slug,
+    meta: { titleSuffix: ' | Polar Science Workspace', icons: [{ rel: 'icon', url: '/icon.svg' }] },
     importMap: {
       baseDir: path.resolve(dirname),
     },
     components: {
-      beforeDashboard: ['/components/StorageBudget#StorageBudget'],
+      graphics: { Logo: '/components/admin/Brand#PortalLogo', Icon: '/components/admin/Brand#PortalIcon' },
+      beforeLogin: ['/components/admin/Brand#LoginIntroduction'],
+      beforeDashboard: ['/components/admin/Brand#WorkspaceIntroduction', '/components/StorageBudget#StorageBudget'],
     },
   },
   collections: [Users, Expeditions, Stations, Reports, Datasets, Publications, Media, Events, OutreachPosts],

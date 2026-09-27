@@ -29,7 +29,7 @@ export const processing: Field[] = [
     type: 'select',
     defaultValue: 'queued',
     options: ['queued', 'processing', 'ready', 'needs_ocr', 'failed'],
-    admin: { position: 'sidebar', readOnly: true },
+    admin: { position: 'sidebar', readOnly: true, components: { Field: '/components/admin/ProcessingField#ProcessingField', Cell: '/components/admin/ProcessingField#ProcessingCell' } },
   },
   // Staff only: a failed query's message carries its parameters, e.g. the text of a draft file.
   { name: 'processing_error', type: 'textarea', access: { read: ({ req }) => Boolean(req.user) }, admin: { position: 'sidebar', readOnly: true } },

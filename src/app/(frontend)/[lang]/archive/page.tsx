@@ -152,7 +152,7 @@ export default async function Archive({ params, searchParams }: { params: Params
         ) : !list || !type ? (
           <LinkedRecords groups={groups} l={l} archiveQuery={query(rest)} empty={t('archive.empty')} />
         ) : total === 0 ? (
-          <p className="text-muted-foreground">{t('archive.empty')}</p>
+          <p className="portal-empty">{t('archive.empty')}</p>
         ) : (
           <>
             <RecordGrid type={type} docs={list.docs as Doc[]} l={l} />

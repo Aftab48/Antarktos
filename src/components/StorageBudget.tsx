@@ -10,6 +10,7 @@ export async function StorageBudget({ payload }: { payload: Payload }) {
   const pct = Math.min(100, (used / STORAGE_BUDGET_BYTES) * 100)
   return (
     <section
+      className="science-panel science-storage"
       aria-labelledby="storage-budget-heading"
       style={{
         border: '1px solid var(--theme-elevation-150)',

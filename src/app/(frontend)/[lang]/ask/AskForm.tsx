@@ -35,7 +35,7 @@ export function AskForm({ locale }: { locale: Locale }) {
   }
 
   return <>
-    <form onSubmit={submit} className="mt-6 rounded-xl border p-5" aria-busy={pending}>
+    <form onSubmit={submit} className="portal-question mt-6 rounded-xl border p-6" aria-busy={pending}>
       <label htmlFor="archive-question" className="block font-medium">{t('ask.question')}</label>
       <p id="question-hint" className="mt-1 text-sm text-muted-foreground">{t('ask.hint')}</p>
       <textarea id="archive-question" name="question" value={question} onChange={(event) => setQuestion(event.target.value)} required maxLength={300} rows={4} disabled={pending} aria-describedby={`question-hint question-length${error ? ' ask-error' : ''}`} aria-invalid={error === t('ask.invalid') ? true : undefined} className="mt-3 block w-full resize-y rounded-md border bg-background px-3 py-2 leading-relaxed disabled:opacity-70" />

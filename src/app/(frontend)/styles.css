@@ -48,22 +48,22 @@
 /* Public site only: this file is imported by app/(frontend)/[lang]/layout.tsx, never by the Payload admin. */
 :root {
     --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, "Noto Sans", "Nirmala UI", "Noto Sans Devanagari", sans-serif;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    --background: #f8fafc;
+    --foreground: #182e40;
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card-foreground: #182e40;
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.37 0.09 255);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.48 0.01 255);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --primary: #163e59;
+    --primary-foreground: #ffffff;
+    --secondary: #e8f1f5;
+    --secondary-foreground: #182e40;
+    --muted: #eef3f6;
+    --muted-foreground: #526475;
+    --accent: #e5f2f0;
+    --accent-foreground: #195c5c;
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
+    --border: #cfdae3;
     --input: oklch(0.922 0 0);
     --ring: oklch(0.5 0.16 255);
     --chart-1: oklch(0.87 0 0);
@@ -71,7 +71,7 @@
     --chart-3: oklch(0.439 0 0);
     --chart-4: oklch(0.371 0 0);
     --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
+    --radius: 0.5rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -127,4 +127,75 @@ input:not([type="checkbox"]):not([type="radio"]), textarea, select {
 
 :where(h1, h2, h3, p, label, legend, button, a, input, textarea, select):lang(hi) {
   line-height: 1.65;
+}
+
+/* The portal owns its type scale, including after a visit to the staff workspace. */
+html { font-size: 16px; }
+body { line-height: 1.65; }
+h1, h2, h3 { color: var(--primary); }
+h1 { line-height: 1.2; }
+h2, h3 { line-height: 1.4; }
+button, input, textarea, select { font: inherit; }
+button, input[type="radio"], input[type="checkbox"] { accent-color: var(--primary); }
+input:not([type="radio"]):not([type="checkbox"]), select { min-height: 2.75rem; }
+button { min-height: 2.75rem; }
+
+.portal-header { background: #fff; border-top-color: #195c5c; }
+.portal-brand { max-width: 48rem; line-height: 1.25; }
+.portal-nav a { border-bottom: 3px solid transparent; margin-bottom: -1px; text-decoration: none; }
+.portal-nav a[aria-current] { border-bottom-color: #195c5c; }
+.portal-nav a:hover { text-decoration: underline; }
+.portal-hero {
+  position: relative;
+  overflow: hidden;
+  border-color: #c4d8e2;
+  border-left: 5px solid #195c5c;
+  background: radial-gradient(ellipse at 105% 15%, #c7e2e4 0, transparent 58%), #e8f1f5;
+}
+.portal-hero h1 { max-width: 52rem; }
+.portal-hero > * { position: relative; }
+.portal-stat { border-top: 3px solid #195c5c; }
+.portal-stat > span:first-child { font-variant-numeric: tabular-nums; margin-bottom: 0.25rem; }
+.portal-featured { border-left: 4px solid #195c5c; }
+.portal-card { box-shadow: 0 2px 6px #163e5906; }
+.portal-card:hover { border-color: #8daebf; }
+.portal-expeditions > li { padding: 0.3rem 0 0.85rem; border-bottom: 1px solid var(--border); }
+.portal-empty {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid #7f9baa;
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  background: var(--card);
+  max-width: 55rem;
+}
+.portal-sources { padding: 1.25rem; background: var(--muted); border: 1px solid var(--border); border-radius: var(--radius); }
+.citation-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.65rem;
+  min-height: 1.5rem;
+  margin: 0 0.15rem;
+  padding: 0.05rem 0.3rem;
+  border: 1px solid #9cb6c4;
+  border-radius: 0.25rem;
+  background: #e8f1f5;
+  color: #163e59;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  vertical-align: baseline;
+}
+.portal-footer { border-top: 3px solid #195c5c; }
+.portal-footer p { max-width: 62rem; }
+.portal-loading-bar { height: 1rem; max-width: 30rem; border-radius: 0.25rem; background: #dbe6ed; }
+.portal-question { border-top: 3px solid #195c5c; background: var(--card); }
+@media (max-width: 40rem) {
+  .portal-brand { flex: 1 1 70%; }
+  .portal-brand span.text-xs { max-width: 17rem; }
+  .portal-nav ul { column-gap: 1.1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; }
 }

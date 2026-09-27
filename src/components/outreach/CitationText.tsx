@@ -9,7 +9,7 @@ export function CitationText({ text, sources, locale, uiLocale = locale, publicS
     const source = sources.find((s) => s.id === part.id)
     if (!source) return null
     const n = sources.indexOf(source) + 1
-    return <sup key={index}><a href={source.pageUrl ?? source.recordUrl} lang={uiLocale} aria-label={source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })} style={{ padding: '0 0.15rem', textDecoration: 'underline' }}>[{formatNumber(uiLocale, n)}]</a></sup>
+    return <sup key={index}><a className="citation-link" href={source.pageUrl ?? source.recordUrl} lang={uiLocale} aria-label={source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })}>[{formatNumber(uiLocale, n)}]</a></sup>
   })
   return <div lang={locale} className={publicStyle ? 'space-y-4 leading-relaxed break-words' : undefined}>
     {text.split(/\n\s*\n/).map((paragraph, i) => {

@@ -5,7 +5,6 @@ import { useRef, useState } from 'react'
 import { PLATFORMS } from '../../outreach/presentation'
 
 const names = { blog: 'Blog', x: 'X', instagram: 'Instagram', linkedin: 'LinkedIn', press_note: 'Press note', student_explainer: 'Student explainer + quiz' }
-const panel = { border: '1px solid var(--theme-elevation-200)', borderRadius: 'var(--style-radius-m)', padding: 'var(--base)', background: 'var(--theme-elevation-0)', color: 'var(--theme-text)', maxWidth: '34rem' }
 
 export function GenerateOutreach() {
   const { id, collectionSlug } = useDocumentInfo()
@@ -47,9 +46,9 @@ export function GenerateOutreach() {
     } catch { setMessage('The response was interrupted. Retry uses the same request ID to avoid another model call.') }
     finally { setBusy(false) }
   }
-  return <details style={{ position: 'relative' }}>
-    <summary style={{ cursor: 'pointer', padding: '0.6rem' }}>Generate outreach</summary>
-    <div style={panel}>
+  return <details className="science-generate">
+    <summary>Generate outreach</summary>
+    <div className="science-panel" aria-busy={busy}>
       <p>Generate a cited draft pack from this saved record. Hindi translates the English pack.</p>
       {(!id || modified) && <p role="status">Save your record and any changes before generating outreach.</p>}
       <fieldset disabled={locked || !!request.current} style={{ border: 0, padding: 0 }}>
@@ -60,7 +59,7 @@ export function GenerateOutreach() {
         <legend>Languages</legend>
         {(['en', 'hi'] as const).map((l) => <label key={l} style={{ marginRight: '1rem' }}><input type="checkbox" checked={languages.includes(l)} onChange={() => toggle(l, languages, setLanguages)} /> {l === 'en' ? 'English' : 'हिन्दी'}</label>)}
       </fieldset>
-      <button type="button" disabled={locked || !platforms.length || !languages.length || posts.length > 0} onClick={generate} style={{ padding: '0.6rem 1rem', cursor: 'pointer' }}>{busy ? 'Generating…' : request.current ? 'Retry same request' : 'Generate draft pack'}</button>
+      <button className="science-action" type="button" disabled={locked || !platforms.length || !languages.length || posts.length > 0} onClick={generate}>{busy ? 'Generating…' : request.current ? 'Retry same request' : 'Generate draft pack'}</button>
       <p role="status" aria-live="polite">{message}</p>
       {posts.length > 0 && <ul>{posts.map((p) => <li key={p.id}><a href={`/admin/collections/outreach-posts/${p.id}`}>{p.platform} · {p.language} · Draft {p.id}</a></li>)}</ul>}
     </div>

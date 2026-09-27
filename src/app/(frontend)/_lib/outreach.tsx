@@ -17,7 +17,7 @@ export const postTitle = (post: Doc, l: Locale) => (typeof post.title === 'strin
 export function PostCard({ post, l }: { post: Doc; l: Locale }) {
   const t = translator(l)
   const media = rel(post.suggested_media)
-  return <article className="flex h-full flex-col gap-3 overflow-hidden rounded-xl border bg-card p-5">
+  return <article className="portal-card flex h-full flex-col gap-3 overflow-hidden rounded-xl border bg-card p-5">
     {media && <MediaImage m={media} l={l} sizes="(min-width: 768px) 30vw, 90vw" className="aspect-[3/2] w-full rounded-lg object-cover" />}
     <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><Badge variant="secondary">{platformLabel(l, post.platform)}</Badge><time dateTime={post.createdAt}>{formatDate(l, post.createdAt)}</time></div>
     <h2 lang={post.title ? post.language : l} className="text-xl font-semibold"><a href={href(l, postPath(post))} className="underline-offset-4 hover:underline">{postTitle(post, l)}</a></h2>
@@ -28,7 +28,7 @@ export function PostCard({ post, l }: { post: Doc; l: Locale }) {
 
 export function Sources({ sources, l }: { sources: CitationSource[]; l: Locale }) {
   const t = translator(l)
-  return <section aria-labelledby="outreach-sources" className="mt-8 border-t pt-6"><h2 id="outreach-sources" className="mb-3 text-xl font-semibold">{t('summary.sources')}</h2>
+  return <section aria-labelledby="outreach-sources" className="portal-sources mt-8"><h2 id="outreach-sources" className="mb-3 text-xl font-semibold">{t('summary.sources')}</h2>
     {sources.length ? <ol className="grid gap-3">{sources.map((s, index) => <li key={s.id} id={`source-${s.id}`} className="rounded-lg border p-4">
       <span className="mr-2 font-medium">[{formatNumber(l, index + 1)}]</span><a href={s.recordUrl} lang={s.titleLocale} className="underline underline-offset-4">{s.title}</a>
       {s.pageUrl && <a href={s.pageUrl} className="ml-3 text-sm underline underline-offset-4">{t('summary.page', { page: formatNumber(l, s.page!) })}</a>}
