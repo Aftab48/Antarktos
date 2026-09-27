@@ -8,6 +8,7 @@
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "check:step2": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/step2/check.ts",
     "check:step3": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/step3/check.ts --",
+    "check:step4b": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/step4b/check.ts",
     "ci": "cross-env NODE_OPTIONS=--no-deprecation payload migrate && npm run build",
     "dataset:collect": "node scripts/dataset/run-all.mjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",

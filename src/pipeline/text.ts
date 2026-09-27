@@ -17,7 +17,8 @@ const edgeKey = (line: string) => line.replace(/\d+/g, '#').replace(/\s+/g, ' ')
 const isEdge = (i: number, n: number) => i < 2 || i >= n - 2
 
 export function cleanPages(raw: string[]): string[] {
-  const pages = raw.map((p) => p.replace(/\uFFFD/g, ' ').split('\n'))
+  // NUL: a PDF's ToUnicode map can emit it, and Postgres text/jsonb rejects it (the whole chunk insert fails).
+  const pages = raw.map((p) => p.replace(/[\uFFFD\u0000]/g, ' ').split('\n'))
   const counts = new Map<string, number>()
   for (const lines of pages) {
     const keys = new Set(lines.filter((_, i) => isEdge(i, lines.length)).map(edgeKey).filter((k) => k.replace(/[#\s]/g, '').length >= 3))

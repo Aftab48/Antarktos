@@ -20,6 +20,10 @@ test('cleanPages strips running headers, page numbers, hyphenation and dot leade
   assert.deepEqual(cleanPages(pages), ['Contents 4\nThe temperature rose in October-November.\nMore text.', 'Ice cores.', 'Penguins.', 'Lakes.'])
 })
 
+test('cleanPages drops NUL, which Postgres text/jsonb rejects', () => {
+  assert.deepEqual(cleanPages(['Polar station\u0000text']), ['Polar station text'])
+})
+
 test('chunks stay on one page, long pages split evenly, Hindi pages get locale hi', () => {
   const chunks = chunkPages([Array.from({ length: 100 }, () => words(10)).join('\n'), 'x', `${words(300, 'हिमनद')}\n`])
   assert.deepEqual(chunks.map((c) => [c.page, c.locale]), [[1, 'en'], [1, 'en'], [3, 'hi']])

@@ -48,6 +48,8 @@ function metaChunks(collection: string, doc: Doc): Row[] {
 // ---- archive_chunks (plan §11) ----
 // Rows are upserted on (collection, doc_id, locale, position), so re-processing the same text keeps chunk ids
 // stable and the [c:id] citations in summaries and outreach posts keep pointing at the right text.
+// Changed text is unpublished until setPublished runs at the end of the job: a draft file over a published
+// record otherwise sat in public search (published = true) during the LLM steps, and for good if they failed.
 
 async function writeChunks(payload: Payload, collection: string, id: number | string, rows: Row[], part: 'meta' | 'pages') {
   const db = payload.db.drizzle
@@ -59,7 +61,7 @@ async function writeChunks(payload: Payload, collection: string, id: number | st
       select ${collection}, ${docId}, x.locale, x.position, x.page, x.heading, x.text
       from jsonb_to_recordset(${json}::jsonb) as x(locale text, position int, page int, heading text, text text)
       on conflict (collection, doc_id, locale, position) do update
-        set page = excluded.page, heading = excluded.heading, text = excluded.text
+        set page = excluded.page, heading = excluded.heading, text = excluded.text, published = false
         where (archive_chunks.page, archive_chunks.heading, archive_chunks.text) is distinct from (excluded.page, excluded.heading, excluded.text)`)
   }
   await db.execute(sql`

@@ -31,7 +31,8 @@ export const processing: Field[] = [
     options: ['queued', 'processing', 'ready', 'needs_ocr', 'failed'],
     admin: { position: 'sidebar', readOnly: true },
   },
-  { name: 'processing_error', type: 'textarea', admin: { position: 'sidebar', readOnly: true } },
+  // Staff only: a failed query's message carries its parameters, e.g. the text of a draft file.
+  { name: 'processing_error', type: 'textarea', access: { read: ({ req }) => Boolean(req.user) }, admin: { position: 'sidebar', readOnly: true } },
 ]
 
 // True while a summary/caption/alt text is still the AI draft; the pipeline sets it, a human edit clears it.
