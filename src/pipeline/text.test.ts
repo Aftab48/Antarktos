@@ -44,6 +44,22 @@ test('groundText drops uncited sentences, invalid citations and unmatched number
   assert.equal(groundText('अभियान २०२३ में जाएगा [c:7]।', chunks).text, 'अभियान २०२३ में जाएगा [c:7]।')
 })
 
+test('summary grounding rejects sign reversals and uncited adjacent sentences', () => {
+  const chunks = new Map([[1, 'The temperature was -10 degrees. The station studies ice.']])
+  assert.equal(groundText('The temperature was 10 degrees [c:1].', chunks).text, '')
+  for (const punctuation of ['.', '!', '?', '।']) {
+    assert.equal(groundText(`Unsupported claim${punctuation}The station studies ice [c:1].`, chunks).text, 'The station studies ice [c:1].')
+  }
+})
+
+test('Hindi summary translation cannot reverse a signed quantity', () => {
+  assert.throws(() => parseTranslation(JSON.stringify({ summary_hi: 'तापमान 10 डिग्री था [c:1]।' }), 'The temperature was -10 degrees [c:1].'), /numbers/)
+})
+
+test('Hindi summary translation rejects uncited sentences despite matching overall source IDs', () => {
+  assert.throws(() => parseTranslation(JSON.stringify({ summary_hi: 'असमर्थित दावा। केंद्र बर्फ का अध्ययन करता है [c:1]।' }), 'The station studies ice [c:1].'), /uncited/)
+})
+
 test('parseSummary validates schema and language, then grounds', () => {
   const chunks = new Map([[1, 'NCPOR invites proposals for the 43rd expedition.']])
   const ok = parseSummary(

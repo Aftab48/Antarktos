@@ -4,7 +4,7 @@
 import OpenAI from 'openai'
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
-import { citedIds, devanagariShare, groundText, numbersIn, parseJsonObject } from './text'
+import { citedIds, devanagariShare, groundText, quantitiesIn, parseJsonObject, citationSentences } from './text'
 
 let client: OpenAI | undefined
 // The SDK defaults (10 min timeout, 2 retries) outlast Vercel's 300 s function limit: one stalled call would get the
@@ -122,9 +122,12 @@ export function parseTranslation(raw: string, english: string): string {
   language(hi, 'hi', 'summary_hi')
   const ids = (t: string) => [...new Set(citedIds(t))].sort((a, b) => a - b).join(',')
   if (ids(hi) !== ids(english)) throw new Error(`summary_hi cites [${ids(hi)}] but the English cites [${ids(english)}]`)
-  const allowed = new Set(numbersIn(english))
-  const extra = numbersIn(hi).filter((n) => !allowed.has(n))
+  const allowed = new Set(quantitiesIn(english))
+  const extra = quantitiesIn(hi).filter((n) => !allowed.has(n))
   if (extra.length) throw new Error(`summary_hi has numbers not in the English: ${extra.join(', ')}`)
+  if (hi.split('\n').flatMap(citationSentences).some((sentence) => !/\[c:\d+\](?:\s*\[c:\d+\])*(?:[.!?।"'”’)]*)\s*$/u.test(sentence))) {
+    throw new Error('summary_hi has an uncited sentence')
+  }
   return hi
 }
 

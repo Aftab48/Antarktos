@@ -1,5 +1,6 @@
 import twitterText from 'twitter-text'
-import { numbersIn } from '../pipeline/text'
+import { citationSentences, quantitiesIn as numericTokens } from '../pipeline/text'
+export { citationSentences } from '../pipeline/text'
 import { diagnosticItem, itemSchemaErrors } from './schema'
 import type { CheckedGenerationItem, EvidenceChunk, GenerationItem, Language, Platform } from './types'
 
@@ -7,38 +8,8 @@ const marker = /\[c:(\d+)\]/gu
 const idsIn = (s: string) => [...s.matchAll(marker)].map(m => m[1])
 const withoutMarkers = (s: string) => s.replace(/\[c:[^\]\r\n]*\]/gu, '')
 const unique = (values: string[]) => [...new Set(values)]
-// Preserve signed quantities in addition to the shared digit/date tokens. A range separator
-// immediately after another number is not a minus sign; -5 and +5 are different assertions.
-const numericTokens = (s: string) => {
-  const normalized = withoutMarkers(s).replace(/[०-९]/gu, d => String('०१२३४५६७८९'.indexOf(d)))
-  const signed = [...normalized.matchAll(/(?:^|[\s(=:])([-−+]\s*\d+(?:[.,]\d+)*)/gu)].map(m => m[1].replace(/\s/gu, '').replace('−', '-').replace(/,(?=\d{2,3}\b)/gu, ''))
-  return [...numbersIn(normalized), ...signed]
-}
 const longForm = (p: Platform) => ['blog', 'press_note', 'student_explainer'].includes(p)
 const genericHeadings = /^(?:Overview|Observations|Methods|Limitations|Conclusion|अवलोकन|प्रेक्षण|विधियाँ|सीमाएँ|निष्कर्ष)$/iu
-
-// Sentence-tail markers belong to the preceding sentence whether before or after punctuation.
-// No short-line exception: even a one-word assertion needs evidence. Decimal periods and common
-// abbreviations are protected; other ambiguity is split conservatively rather than laundering claims.
-export function citationSentences(line: string): string[] {
-  const result: string[] = []
-  let start = 0
-  for (let i = 0; i < line.length; i++) {
-    if (!/[.!?।]/u.test(line[i])) continue
-    if (line[i] === '.' && /\d/u.test(line[i - 1] ?? '') && /\d/u.test(line[i + 1] ?? '')) continue
-    if (line[i] === '.' && /(?:\b(?:Dr|Mr|Mrs|Ms|Prof|Shri|Smt|Govt|No|vs)|\b[A-Z])$/u.test(line.slice(start, i))) continue
-    let end = i + 1
-    // Include adjacent closing quote and all following citation markers, never the next statement.
-    const tail = line.slice(end).match(/^["'”’)]*(?:\s*\[c:[^\]\r\n]*\])*/u)?.[0] ?? ''
-    end += tail.length
-    if (end < line.length && !/\s/u.test(line[end]) && !tail.includes('[c:')) continue
-    result.push(line.slice(start, end).trim())
-    start = end
-    i = end - 1
-  }
-  if (line.slice(start).trim()) result.push(line.slice(start).trim())
-  return result.filter(Boolean)
-}
 
 function cleanCitations(text: string, allowed: Set<string>, issues: string[]): string {
   return text.replace(/\[c:[^\]\r\n]*\]/gu, m => {

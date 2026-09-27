@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto'
 import { isIP } from 'node:net'
-import { devanagariShare, numbersIn } from '../pipeline/text'
+import { devanagariShare, quantitiesIn } from '../pipeline/text'
 import { COLLECTIONS, type Locale, type RetrievedChunk, type SearchFilters } from './types'
 
 export class InputError extends Error {}
@@ -82,8 +82,8 @@ export function validateAnswer(raw: string, chunks: RetrievedChunk[], locale: Lo
     // Fail closed on multiple sentences in one array entry, including no-space punctuation.
     // Decimal dots are allowed; abbreviations can be written out by the model.
     if (!prose || /[!?।\n]|(?<!\d)\.|\.(?!\d)/u.test(prose)) { checks.sentences = false; continue }
-    const allowed = new Set(allIds.flatMap((id) => numbersIn(byId.get(id)!)))
-    if (numbersIn(prose).some((n) => !allowed.has(n))) { checks.numbers = false; continue }
+    const allowed = new Set(allIds.flatMap((id) => quantitiesIn(byId.get(id)!)))
+    if (quantitiesIn(prose).some((n) => !allowed.has(n))) { checks.numbers = false; continue }
     const share = devanagariShare(prose)
     if (locale === 'hi' ? share < 0.6 : share > 0.05 || !/[a-z]/iu.test(prose)) { checks.language = false; continue }
     sentence = sentence.replace(/\s+([.!?।])/gu, '$1')

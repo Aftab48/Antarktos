@@ -5,6 +5,7 @@ import { answerQuestion, RateLimitError, reserveAsk, type AskDependencies, type 
 import { buildSearchSQL, recordURL } from './database'
 import { boundedJson, hashedClientIP, normalizeQuestion, parseSearchFilters, validateAnswer, validateQuestion } from './validation'
 import type { AskAnswer, RetrievedChunk } from './types'
+import { quantitiesIn } from '../pipeline/text'
 
 const chunk: RetrievedChunk = { chunkId: '17', collection: 'stations', docId: '1', title: 'Bharati', titleLocale: 'en', url: '/stations/1', locale: 'en', page: null, heading: null, snippet: '', rank: 1, region: 'antarctic', year: 2012,
   text: 'Bharati is in Antarctica. It opened in 2012. Researchers study ocean currents. The temperature was -10 degrees.' }
@@ -79,6 +80,19 @@ test('one valid sentence survives alongside a rejected grouped citation', () => 
   const checked = validateAnswer(raw(['Bharati is in Antarctica [c:17, c:999].', valid[1]]), [chunk], 'en')
   assert.deepEqual(checked.sentences, [valid[1]])
   assert.equal(checked.checks.citations, false)
+})
+
+test('Ask preserves quantity signs in both directions, including Hindi digits', () => {
+  assert.deepEqual(quantitiesIn('2023-24, 1,00,000, +5, -1.5, −१० [c:17]'), ['2023', '2024', '100000', '5', '-1.5', '-10'])
+  for (const [source, unsupported] of [['-10', '10'], ['-10', '+10'], ['10', '-10'], ['−१०', '१०']]) {
+    const evidence = { ...chunk, text: `The temperature was ${source} degrees.` }
+    const checked = validateAnswer(raw([`The temperature was ${unsupported} degrees [c:17].`]), [evidence], 'en')
+    assert.deepEqual(checked.sentences, [])
+    assert.equal(checked.checks.numbers, false)
+  }
+  for (const supported of ['-10', '−10', '-१०']) {
+    assert.equal(validateAnswer(raw([`The temperature was ${supported} degrees [c:17].`]), [chunk], 'en').sentences.length, 1)
+  }
 })
 
 function mock(overrides: Partial<AskDependencies> = {}) {

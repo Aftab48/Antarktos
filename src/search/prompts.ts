@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 
-export const ASK_PROMPT_VERSION = 'ask-v1.1'
+export const ASK_PROMPT_VERSION = 'ask-v1.2'
 export const KEYWORD_PROMPT_VERSION = 'keywords-v1'
 
 // Literal paths allow Next's file tracing to include the versioned prompt artifacts.

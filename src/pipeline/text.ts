@@ -85,14 +85,40 @@ export const numbersIn = (text: string) =>
     m[0].replace(/,(?=\d{2,3}\b)/g, ''),
   )
 
-// Sentences of a text, headings and blank lines skipped. "।" ends a Hindi sentence.
-// ponytail: "." after a 1-3 letter word (Dr., M., डॉ.) counts as an abbreviation, so a Hindi sentence
-// ending "है." merges with the next one; fine while models end Hindi sentences with "।".
+// Quantity comparison must not let a negative source support a positive claim.
+// A hyphen directly after a digit is a range/date separator, not a unary minus.
+export const quantitiesIn = (text: string) =>
+  [...toAsciiDigits(text.replace(/\[c:[^\]\r\n]*\]/gu, ''))
+    .replace(/\b(\d{2})(\d{2})\s*[-–]\s*(\d{2})\b/g, '$1$2-$1$3')
+    .matchAll(/(?:(?<![\d.,])[-−+]\s*)?\d+(?:[.,]\d+)*/gu)]
+    .map((m) => m[0].replace(/\s/gu, '').replace('−', '-').replace(/^\+/u, '').replace(/,(?=\d{2,3}\b)/g, ''))
+
+// Keep trailing citations with their sentence even when punctuation has no following space.
+// Decimal periods and common abbreviations are protected; ambiguous boundaries split safely.
+export function citationSentences(line: string): string[] {
+  const result: string[] = []
+  let start = 0
+  for (let i = 0; i < line.length; i++) {
+    if (!/[.!?।]/u.test(line[i])) continue
+    if (line[i] === '.' && /\d/u.test(line[i - 1] ?? '') && /\d/u.test(line[i + 1] ?? '')) continue
+    if (line[i] === '.' && /(?:\b(?:Dr|Mr|Mrs|Ms|Prof|Shri|Smt|Govt|No|vs)|\b[A-Z])$/u.test(line.slice(start, i))) continue
+    let end = i + 1
+    const tail = line.slice(end).match(/^["'”’)]*(?:\s*\[c:[^\]\r\n]*\])*/u)?.[0] ?? ''
+    end += tail.length
+    result.push(line.slice(start, end).trim())
+    start = end
+    i = end - 1
+  }
+  if (line.slice(start).trim()) result.push(line.slice(start).trim())
+  return result.filter(Boolean)
+}
+
+// Summary headings and blank lines are not factual sentences.
 export const sentences = (body: string) =>
   body
     .split('\n')
     .filter((l) => l.trim() && !/^\s*#/.test(l))
-    .flatMap((l) => l.split(/(?<=(?:(?<!\b(?:Dr|Mr|Mrs|Ms|Prof|Shri|Smt|Govt|No|vs|[A-Z])|(?:^|[\s(])[\u0900-\u097F]{1,3})\.|[!?।])(?:\s*\[c:\d+\])*)\s+(?!\[c:)/))
+    .flatMap(citationSentences)
     .map((s) => s.trim())
     .filter((s) => s.replace(/[\s*_\-•]/g, '').length > 3)
 
@@ -104,13 +130,13 @@ export function devanagariShare(text: string): number {
 // Keeps grounded sentences only: citation markers for chunks outside `chunks` are removed, then a
 // sentence is dropped when it cites nothing or has a number none of its cited chunks contains.
 export function groundText(text: string, chunks: Map<number, string>): { text: string; dropped: string[] } {
-  const nums = new Map([...chunks].map(([id, t]) => [id, new Set(numbersIn(t))]))
+  const nums = new Map([...chunks].map(([id, t]) => [id, new Set(quantitiesIn(t))]))
   const kept: string[] = []
   const dropped: string[] = []
   for (const s of sentences(text)) {
     const clean = s.replace(MARKER, (m, id) => (chunks.has(Number(id)) ? m : '')).replace(/\s{2,}/g, ' ').trim()
     const ids = citedIds(clean)
-    const ok = ids.length > 0 && numbersIn(clean).every((n) => ids.some((id) => nums.get(id)!.has(n)))
+    const ok = ids.length > 0 && quantitiesIn(clean).every((n) => ids.some((id) => nums.get(id)!.has(n)))
     if (ok) kept.push(clean)
     else dropped.push(s)
   }

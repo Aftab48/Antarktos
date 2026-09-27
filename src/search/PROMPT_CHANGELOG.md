@@ -1,5 +1,10 @@
 # Search prompt changelog
 
+## ask-v1.2 — 2026-09-28
+
+- Preserve numeric signs during answer validation, including Unicode minus and Hindi digits. A negative source no longer supports a positive answer.
+- Prompt text and model settings are unchanged. The version bump invalidates cached answers accepted by the older validator.
+
 ## ask-v1.1 — 2026-09-28
 
 - A bounded live response used `[c:8, c:524]`; explicitly require separate markers such as `[c:8][c:524]`. The malformed sentence is discarded.

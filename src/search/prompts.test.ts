@@ -56,7 +56,7 @@ test('ask messages preserve adversarial inputs strictly as JSON data', () => {
   assert.match(messages[0].content, /"sentences": \[\]/)
   assert.deepEqual(JSON.parse(messages[1].content).chunks, [{ id: '17', heading: malicious, text: malicious }])
   assert.equal(JSON.parse(messages[1].content).question, malicious)
-  assert.equal(ASK_PROMPT_VERSION, 'ask-v1.1')
+  assert.equal(ASK_PROMPT_VERSION, 'ask-v1.2')
   assert.equal(JSON.parse(buildKeywordMessages(malicious)[1].content).question, malicious)
 })
 

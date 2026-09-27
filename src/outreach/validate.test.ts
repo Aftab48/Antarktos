@@ -24,6 +24,14 @@ test('sentence-tail citations do not launder a preceding uncited sentence', () =
   assert.equal(result.checks.length, false)
 })
 
+test('adjacent sentences without spaces cannot borrow the next sentence citation', () => {
+  for (const punctuation of ['.', '!', '?', '।']) {
+    const result = validate(item('blog', { body: `Unsupported claim${punctuation}The team recorded salinity. [c:1]` }))
+    assert.equal(result.item.body, 'The team recorded salinity. [c:1]')
+    assert.equal(result.checks.citations, false)
+  }
+})
+
 test('citation segmentation supports Hindi danda, decimals and marker-before-period', () => {
   assert.deepEqual(citationSentences('Temperature was 1.5. [c:1] The team measured salinity [c:1].'), ['Temperature was 1.5. [c:1]', 'The team measured salinity [c:1].'])
   const result = validate(item('blog', { body: 'तापमान दर्ज किया गया। [c:1] दावा गलत है।', language: 'hi' }))
@@ -50,6 +58,14 @@ test('a positive magnitude in evidence cannot support a negative quantity', () =
   const result = validate(item('linkedin', { body: 'The recorded temperature was -4 degrees.' }))
   assert.equal(result.checks.numbers, false)
   assert.match(result.issues.join(' '), /Unsupported number -4/u)
+})
+
+test('negative outreach evidence cannot support an unsigned or positive quantity', () => {
+  for (const quantity of ['4', '+4', '४']) {
+    const value = item('linkedin', { body: `The temperature was ${quantity} degrees.` })
+    const result = validateGenerationPack({ items: [value] }, { platforms: ['linkedin'], language: 'en', chunks: [{ id: '1', text: 'The temperature was -4 degrees.' }] }).items[0]
+    assert.equal(result.checks.numbers, false)
+  }
 })
 
 test('malformed combined marker IDs are not factual numbers, while actual numbers remain checked', () => {
