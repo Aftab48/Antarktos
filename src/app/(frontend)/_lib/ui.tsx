@@ -70,7 +70,8 @@ export function coordinates(l: Locale, lat?: number | null, lng?: number | null)
 // Resized copies from upload time (plan §6.3); the original only if no copy exists.
 export function MediaImage({ m, l, sizes, className, eager }: { m: Doc; l: Locale; sizes: string; className?: string; eager?: boolean }) {
   if (!m?.url || !m.mimeType?.startsWith('image/')) return null
-  const alt = pick(m.alt, l)
+  // A missing dedicated alt must not hide an informative archive photo from assistive technology.
+  const alt = pick(m.alt, l) ?? pick(m.caption, l)
   const copies = [m.sizes?.thumbnail, m.sizes?.large].filter((s) => s?.url && s.width)
   return (
     // eslint-disable-next-line @next/next/no-img-element -- files are served from R2, already resized (plan §6.3)
@@ -80,7 +81,7 @@ export function MediaImage({ m, l, sizes, className, eager }: { m: Doc; l: Local
       sizes={sizes}
       width={m.width ?? undefined}
       height={m.height ?? undefined}
-      alt={alt ? alt.value : ''}
+      alt={alt ? stripMarkers(alt.value) : ''}
       lang={alt && alt.lang !== l ? alt.lang : undefined}
       loading={eager ? undefined : 'lazy'}
       decoding="async"

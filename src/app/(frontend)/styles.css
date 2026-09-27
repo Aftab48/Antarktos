@@ -93,11 +93,16 @@
   html {
     @apply font-sans;
     }
-  /* One visible focus style everywhere (WCAG 2.4.7). */
-  :focus-visible {
-    outline: 3px solid var(--ring);
-    outline-offset: 2px;
-  }
+}
+/* Keep controls discernible on white, independently of surrounding card borders (1.4.11). */
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  border-color: oklch(0.55 0.02 255);
+}
+
+/* Unlayered so component utilities cannot replace this with a translucent ring (2.4.7). */
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
 }
 /* Self-hosted OFL font: consistent conjuncts and vowel marks, without a third-party request. */
 @font-face {
