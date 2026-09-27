@@ -1,20 +1,18 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+
+import en from '../../src/i18n/en.json'
+import hi from '../../src/i18n/hi.json'
 
 test.describe('Frontend', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }, testInfo) => {
-    const context = await browser.newContext()
-    page = await context.newPage()
-  })
-
-  test('can go on homepage', async ({ page }) => {
+  test('home page in English and Hindi', async ({ page }) => {
     await page.goto('http://localhost:3000')
+    await expect(page).toHaveTitle(en['site.name'])
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await expect(page.locator('h1').first()).toHaveText(en['home.title'])
 
-    await expect(page).toHaveTitle(/Payload Blank Template/)
-
-    const heading = page.locator('h1').first()
-
-    await expect(heading).toHaveText('Welcome to your new project.')
+    await page.getByRole('link', { name: en['lang.switch'] }).click()
+    await expect(page).toHaveURL(/\/hi$/)
+    await expect(page.locator('html')).toHaveAttribute('lang', 'hi')
+    await expect(page.locator('h1').first()).toHaveText(hi['home.title'])
   })
 })
