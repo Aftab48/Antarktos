@@ -4,6 +4,7 @@ import * as migration_20260927_130458_localize_media_alt from './20260927_130458
 import * as migration_20260927_130755_collections from './20260927_130755_collections';
 import * as migration_20260927_131000_archive_chunks from './20260927_131000_archive_chunks';
 import * as migration_20260927_150000_chunks_published from './20260927_150000_chunks_published';
+import * as migration_20260927_170000_hindi_search from './20260927_170000_hindi_search';
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20260927_150000_chunks_published.up,
     down: migration_20260927_150000_chunks_published.down,
     name: '20260927_150000_chunks_published',
+  },
+  {
+    up: migration_20260927_170000_hindi_search.up,
+    down: migration_20260927_170000_hindi_search.down,
+    name: '20260927_170000_hindi_search',
   },
 ];

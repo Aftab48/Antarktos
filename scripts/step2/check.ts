@@ -228,7 +228,7 @@ try {
       ('reports', 'step2-check', 'en', 0, 3, 'Glaciology', 'Scientists measured the retreating glaciers near Himadri.'),
       ('reports', 'step2-check', 'hi', 0, 3, null, 'वैज्ञानिकों ने हिमाद्री के पास हिमनद मापे।')`)
     const en = await q(sql`select id from archive_chunks where doc_id = 'step2-check' and tsv @@ websearch_to_tsquery('english', 'glacier retreat')`)
-    const hi = await q(sql`select id from archive_chunks where doc_id = 'step2-check' and tsv @@ websearch_to_tsquery('simple', 'हिमाद्री')`)
+    const hi = await q(sql`select id from archive_chunks where doc_id = 'step2-check' and tsv @@ websearch_to_tsquery('hindi', 'हिमाद्री')`)
     assert.deepEqual([en.length, hi.length], [1, 1])
     await q(sql`insert into ask_log (ip_hash, question, answer) values ('step2-check', 'q', '{"a":1}')`)
     assert.equal((await q(sql`select count(*)::int as n from ask_log where ip_hash = 'step2-check'`))[0].n, 1)

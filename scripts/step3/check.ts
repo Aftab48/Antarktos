@@ -237,7 +237,7 @@ await step('its chunks carry PDF page numbers and are found by full-text search'
     where collection = 'reports' and doc_id = ${String(isea.id)} and tsv @@ q order by rank desc`)
   assert.ok(hits.length && hits[0].page >= 1, 'search hit with a page')
   const hi = await db(sql`
-    select count(*)::int as n from archive_chunks, to_tsquery('simple', 'अंटार्कटिका') q
+    select count(*)::int as n from archive_chunks, to_tsquery('hindi', 'अंटार्कटिका') q
     where collection = 'reports' and doc_id = ${String(isea.id)} and locale = 'hi' and tsv @@ q`)
   console.log(`    english hit on PDF page ${hits[0].page}; Hindi record chunk matches अंटार्कटिका: ${hi[0].n > 0}`)
 })
