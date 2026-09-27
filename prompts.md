@@ -3,9 +3,9 @@
 Give the coding agent one prompt at a time. After each one, check the **Done when** line yourself before moving on.
 The agent reads `AGENTS.md`, and that file points it to `plan/SIH26063_plan.md`.
 
-**Setup status:** Neon ☐, OpenRouter ✓ (credits), Cloudflare R2 ☐, Vercel ☐, `.env.local` ☐, git repo ☐
+**Setup status:** Payload 3 scaffold ✓ (blank template, Postgres adapter), git repo ✓ (github.com/Aftab48/SIH26063), `PAYLOAD_SECRET` ✓ (dev value in `.env`, rotate before final deploy), OpenRouter ✓ (credits), Neon ☐, Cloudflare R2 ☐, Vercel ☐
 
-Before prompt 1: create the Neon project, the R2 bucket + API token, and a Vercel project; put the values in `.env.local`.
+Before prompt 1: create the Neon project, the R2 bucket + API token, and a Vercel project; put the values in `.env` (Payload's default, gitignored).
 
 ---
 
@@ -13,7 +13,7 @@ Before prompt 1: create the Neon project, the R2 bucket + API token, and a Verce
 
 ```text
 Use the Rapid Prototyper agent. Do plan §18 "Day-1 checks" only.
-Run git init. Scaffold Next.js + Payload CMS 3 with the Postgres adapter on Neon, and a .gitignore that ignores .env*, plan/, docs/, data/, artifacts/, node_modules/, .next/ (but keeps .env.local.example). Create .env.local.example (keys only). .env.local already exists with real values; don't overwrite it.
+The Payload 3 blank template is already scaffolded and pushed; build on it, don't re-scaffold. Add the missing env var names to .env.example (names only). .env already has real values; don't overwrite it.
 Then check, in this order, and record the real results:
 (a) a Payload migration runs on Neon; which connection string migrations need;
 (b) @payloadcms/storage-s3 on R2 with client-side uploads: upload a 20 MB PDF from the deployed Vercel preview, not only localhost;

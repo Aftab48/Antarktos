@@ -24,7 +24,7 @@
 - Smallest working change. No abstractions, config or scaffolding for later steps.
 - Items marked "(verify)" in the plan: check the real API response or current docs before depending on them, and tell me if the plan is wrong. Update the plan section when a verify item is resolved.
 - Each step that has logic leaves one runnable check (`node --test` file or a script under `scripts/<step>/`). No test frameworks unless asked.
-- Env vars live in `.env.local` (never commit it): `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `PAYLOAD_SECRET`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL`, `OPENROUTER_API_KEY`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `APP_BASE_URL`, `IP_HASH_SALT`. `.env.local.example` holds names only.
+- Env vars live in `.env` (Payload's default; gitignored, never commit it): `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `PAYLOAD_SECRET`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL`, `OPENROUTER_API_KEY`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `APP_BASE_URL`, `IP_HASH_SALT`. `.env.example` holds names only. `PAYLOAD_SECRET` in `.env` is a shared dev value; never change it (it would invalidate logins) — it gets rotated before the final deploy.
 - Write working notes and verification results to `docs/<step>.md`, raw API outputs to `artifacts/<step>/`.
 - Commit after each step with a clear message. Never commit `plan/`, `docs/`, `data/` or `artifacts/`; they are gitignored on purpose, so never `git add -f` them.
 - Never push unless I ask. Never force-push, rewrite history or amend commits.
