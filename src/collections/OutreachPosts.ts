@@ -22,6 +22,7 @@ export const OutreachPosts: CollectionConfig = {
     ],
   },
   fields: [
+    { name: 'outreachReviewPreview', type: 'ui', admin: { components: { Field: '/components/outreach/ReviewPreview#ReviewPreview' } } },
     {
       name: 'source',
       type: 'relationship',
@@ -64,7 +65,7 @@ export const OutreachPosts: CollectionConfig = {
     { name: 'suggested_media', type: 'upload', relationTo: 'media' },
     { name: 'cited_chunk_ids', type: 'number', hasMany: true, admin: { readOnly: true } },
     // Pass/fail check list for the reviewer (plan §10.3). Never a numeric confidence.
-    { name: 'checks', type: 'json', admin: { readOnly: true } },
+    { name: 'checks', type: 'json', admin: { readOnly: true, hidden: true } },
     { name: 'check_issues', type: 'text', hasMany: true, admin: { readOnly: true } },
     { name: 'generation_request_id', type: 'text', index: true, admin: { readOnly: true, position: 'sidebar' }, access: { read: ({ req }) => staffRole(req.user?.role) } },
     { name: 'model', type: 'text', admin: { readOnly: true, position: 'sidebar' } },

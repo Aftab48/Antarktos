@@ -8,7 +8,7 @@ import { aiGenerated, expedition, processing, provenance, region, stations, year
 // A report is its PDF plus metadata: the collection itself is the upload (plan §16 "file (PDF upload)").
 export const Reports: CollectionConfig = {
   slug: 'reports',
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'report_type', 'year', '_status', 'processing_state'] },
+  admin: { components: { edit: { beforeDocumentControls: ['/components/outreach/GenerateOutreach#GenerateOutreach'] } }, useAsTitle: 'title', defaultColumns: ['title', 'report_type', 'year', '_status', 'processing_state'] },
   access: contentAccess,
   versions: { drafts: true },
   hooks: { beforeChange: [onlyPublishersPublish, checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },

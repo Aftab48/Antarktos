@@ -8,7 +8,7 @@ import { aiGenerated, expedition, processing, provenance, region, stations } fro
 // Photos and short video clips; long videos are YouTube links (plan §6.1, §9).
 export const Media: CollectionConfig = {
   slug: 'media',
-  admin: { useAsTitle: 'filename', defaultColumns: ['filename', 'alt', '_status', 'processing_state'] },
+  admin: { components: { edit: { beforeDocumentControls: ['/components/outreach/GenerateOutreach#GenerateOutreach'] } }, useAsTitle: 'filename', defaultColumns: ['filename', 'alt', '_status', 'processing_state'] },
   access: contentAccess,
   versions: { drafts: true },
   hooks: { beforeChange: [onlyPublishersPublish, checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },

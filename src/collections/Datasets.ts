@@ -9,7 +9,7 @@ import { expedition, processing, provenance, region, stations, year } from './fi
 // ponytail: one file per dataset (zip several); add a dataset-files upload collection if records need many.
 export const Datasets: CollectionConfig = {
   slug: 'datasets',
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'format', 'year', '_status'] },
+  admin: { components: { edit: { beforeDocumentControls: ['/components/outreach/GenerateOutreach#GenerateOutreach'] } }, useAsTitle: 'title', defaultColumns: ['title', 'format', 'year', '_status'] },
   access: contentAccess,
   versions: { drafts: true },
   hooks: { beforeChange: [onlyPublishersPublish, checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },

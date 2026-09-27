@@ -7,7 +7,7 @@ import { expedition, processing, provenance, region, stations } from './fields'
 // Institutional activities (plan §9).
 export const Events: CollectionConfig = {
   slug: 'events',
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'date', 'event_type', '_status'] },
+  admin: { components: { edit: { beforeDocumentControls: ['/components/outreach/GenerateOutreach#GenerateOutreach'] } }, useAsTitle: 'title', defaultColumns: ['title', 'date', 'event_type', '_status'] },
   access: contentAccess,
   versions: { drafts: true },
   hooks: { beforeChange: [onlyPublishersPublish, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },

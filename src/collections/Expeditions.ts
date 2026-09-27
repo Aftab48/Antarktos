@@ -6,7 +6,7 @@ import { provenance, region } from './fields'
 
 export const Expeditions: CollectionConfig = {
   slug: 'expeditions',
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'region', 'season_start', '_status'] },
+  admin: { components: { edit: { beforeDocumentControls: ['/components/outreach/GenerateOutreach#GenerateOutreach'] } }, useAsTitle: 'title', defaultColumns: ['title', 'region', 'season_start', '_status'] },
   access: contentAccess,
   versions: { drafts: true },
   // Indexed for search as one chunk per locale (plan §7, §11).

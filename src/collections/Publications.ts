@@ -8,7 +8,7 @@ import { expedition, processing, provenance, region, stations, year } from './fi
 // Metadata record with an optional PDF (the collection itself is the upload).
 export const Publications: CollectionConfig = {
   slug: 'publications',
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'venue', 'year', '_status'] },
+  admin: { components: { edit: { beforeDocumentControls: ['/components/outreach/GenerateOutreach#GenerateOutreach'] } }, useAsTitle: 'title', defaultColumns: ['title', 'venue', 'year', '_status'] },
   access: contentAccess,
   versions: { drafts: true },
   hooks: { beforeChange: [onlyPublishersPublish, checkUpload, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },
