@@ -213,5 +213,6 @@
   "stations.mapError": "The map could not load. Use the station list below.",
   "stations.mapEmpty": "No published station coordinates are available yet.",
   "stations.zoomIn": "Zoom in",
-  "stations.zoomOut": "Zoom out"
+  "stations.zoomOut": "Zoom out",
+  "outreach.downloadCard": "Download Instagram card"
 }

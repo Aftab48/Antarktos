@@ -5,6 +5,7 @@ import { CitationText } from '@/components/outreach/CitationText'
 import { formatDate, formatNumber, href, translator, type Key, type Locale } from '@/i18n'
 import { outreachCitations } from '@/outreach/citation-data'
 import { copyText, type CitationSource } from '@/outreach/presentation'
+import { cardInput } from '@/outreach/instagram-card'
 import { type Doc, rel } from './data'
 import { en, MediaImage } from './ui'
 import { ShareActions } from '../[lang]/news/ShareActions'
@@ -48,7 +49,7 @@ export async function PostBody({ post, l, children }: { post: Doc; l: Locale; ch
     {media && <figure className="mb-8"><MediaImage m={media} l={l} sizes="(min-width: 1024px) 48rem, 95vw" eager className="max-h-[32rem] w-full rounded-xl object-contain" />{media.credit && <figcaption className="mt-2 text-sm text-muted-foreground">{t('field.credit')}: {en(l, media.credit)}{media.license && <> · {en(l, media.license)}</>}</figcaption>}</figure>}
     {[post.dateline, ...(post.thread?.length ? post.thread.map((p: Doc) => p.text) : [post.body]), post.about].filter(Boolean).map((value, index) => <div key={index} className="mb-5"><CitationText text={value} sources={sources} locale={contentLocale} uiLocale={l} publicStyle /></div>)}
     {post.hashtags?.length > 0 && <p lang={contentLocale} className="my-5 break-words text-sm text-muted-foreground">{post.hashtags.join(' ')}</p>}
-    <ShareActions post={{ language: contentLocale, id: post.id, platform: post.platform, title: post.title, body: post.body, hashtags: post.hashtags, thread: post.thread, dateline: post.dateline, about: post.about, suggested_media: Boolean(media) }} l={l} />
+    <ShareActions post={{ language: contentLocale, id: post.id, platform: post.platform, title: post.title, body: post.body, hashtags: post.hashtags, thread: post.thread, dateline: post.dateline, about: post.about, suggested_media: Boolean(media), cardAvailable: Boolean(cardInput(post, process.env.R2_PUBLIC_URL ?? '')) }} l={l} />
     {children}
     <Sources sources={sources} l={l} />
   </>

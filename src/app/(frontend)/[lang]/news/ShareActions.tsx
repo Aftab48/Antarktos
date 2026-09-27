@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { translator, type Locale } from '@/i18n'
 import { copyText, linkedInIntent, xIntent } from '@/outreach/presentation'
 
-type Post = { language?: Locale; id: number; platform: string; title?: string; body: string; hashtags?: string[]; thread?: { text: string }[]; dateline?: string; about?: string; suggested_media?: unknown }
+type Post = { language?: Locale; id: number; platform: string; title?: string; body: string; hashtags?: string[]; thread?: { text: string }[]; dateline?: string; about?: string; suggested_media?: unknown; cardAvailable?: boolean }
 
 export function ShareActions({ post, l }: { post: Post; l: Locale }) {
   const t = translator(l)
@@ -24,6 +24,7 @@ export function ShareActions({ post, l }: { post: Post; l: Locale }) {
       {post.platform === 'x' && <Button asChild variant="outline"><a href={xIntent(copyText({ body: post.body, hashtags: post.hashtags }))} target="_blank" rel="noopener noreferrer">{t('outreach.shareX')}</a></Button>}
       {post.platform === 'linkedin' && <Button type="button" variant="outline" onClick={shareLinkedIn}>{t('outreach.shareLinkedIn')}</Button>}
       {post.platform === 'instagram' && !!post.suggested_media && <Button asChild variant="outline"><a href={`/api/outreach-image/${post.id}`}>{t('outreach.downloadImage')}</a></Button>}
+      {post.cardAvailable && <Button asChild variant="outline"><a href={`/api/instagram-card/${post.id}`}>{t('outreach.downloadCard')}</a></Button>}
     </div>
     {post.platform === 'linkedin' && <p className="mt-3 text-sm text-muted-foreground">{t('outreach.linkedInHint')}</p>}
     {post.platform === 'x' && !!post.thread?.length && <div className="mt-3 flex flex-wrap gap-3">{post.thread.slice(1).map((item, i) => <a key={i} className="text-sm underline underline-offset-4" href={xIntent(copyText({ body: item.text }))} target="_blank" rel="noopener noreferrer">{t('outreach.shareThread', { n: i + 2 })}</a>)}</div>}

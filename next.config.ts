@@ -9,6 +9,9 @@ const dirname = path.dirname(__filename)
 const nextConfig: NextConfig = {
   // Our AGENTS.md / CLAUDE.md are hand-written; don't let `next dev` append its own agent-rules block.
   agentRules: false,
+  outputFileTracingIncludes: {
+    '/api/instagram-card/*': ['./public/fonts/NotoSansDevanagari.ttf'],
+  },
   images: {
     localPatterns: [
       {

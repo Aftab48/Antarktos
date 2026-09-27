@@ -213,5 +213,6 @@
   "stations.mapError": "मानचित्र लोड नहीं हो सका। नीचे केंद्रों की सूची देखें।",
   "stations.mapEmpty": "अभी किसी प्रकाशित केंद्र के निर्देशांक उपलब्ध नहीं हैं।",
   "stations.zoomIn": "बड़ा करें",
-  "stations.zoomOut": "छोटा करें"
+  "stations.zoomOut": "छोटा करें",
+  "outreach.downloadCard": "इंस्टाग्राम कार्ड डाउनलोड करें"
 }
