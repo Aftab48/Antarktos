@@ -31,7 +31,7 @@ const r2Collection = {
 export default buildConfig({
   admin: {
     user: Users.slug,
-    meta: { titleSuffix: ' | Polar Science Workspace', icons: [{ rel: 'icon', url: '/icon.svg' }] },
+    meta: { titleSuffix: ' | Antarktos', icons: [{ rel: 'icon', url: '/icon.svg' }] },
     importMap: {
       baseDir: path.resolve(dirname),
     },

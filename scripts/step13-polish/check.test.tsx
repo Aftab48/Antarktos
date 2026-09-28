@@ -37,7 +37,7 @@ test('staff login branding provides a heading and preserves the prototype disclo
   const document = documentFor(renderToStaticMarkup(<><PortalLogo /><LoginIntroduction /></>))
   assert.equal(document.querySelectorAll('h1').length, 1)
   assert.match(document.body.textContent ?? '', /Not an official government website/)
-  assert.match(document.body.textContent ?? '', /Polar Science Portal/)
+  assert.match(document.body.textContent ?? '', /Antarktos/)
 })
 
 test('styled citations retain their exact source-page links and Hindi accessible label', () => {

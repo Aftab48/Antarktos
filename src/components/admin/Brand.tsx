@@ -3,7 +3,7 @@ function Mark() {
 }
 
 export function PortalLogo() {
-  return <div className="science-brand"><Mark /><span>Polar Science Portal<span className="science-brand__sub">Archive &amp; outreach workspace</span></span></div>
+  return <div className="science-brand"><Mark /><span>Antarktos<span className="science-brand__sub">Archive &amp; outreach workspace</span></span></div>
 }
 
 export function PortalIcon() { return <Mark /> }
@@ -13,5 +13,5 @@ export function LoginIntroduction() {
 }
 
 export function WorkspaceIntroduction() {
-  return <div className="science-workspace-intro"><p className="science-eyebrow">Polar Science Portal · Staff workspace</p><h2>From archive to public understanding</h2><p>Upload and process source records, review citations and checks, then publish approved content.</p></div>
+  return <div className="science-workspace-intro"><p className="science-eyebrow">Antarktos · Staff workspace</p><h2>From archive to public understanding</h2><p>Upload and process source records, review citations and checks, then publish approved content.</p></div>
 }
