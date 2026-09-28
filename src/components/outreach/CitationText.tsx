@@ -9,12 +9,12 @@ export function CitationText({ text, sources, locale, uiLocale = locale, publicS
     const source = sources.find((s) => s.id === part.id)
     if (!source) return null
     const n = sources.indexOf(source) + 1
-    return <sup key={index}><a className="citation-link" href={source.pageUrl ?? source.recordUrl} lang={uiLocale} aria-label={source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })}>[{formatNumber(uiLocale, n)}]</a></sup>
+    return <sup key={index}><a className="citation-link" href={source.pageUrl ?? source.recordUrl} lang={uiLocale} aria-label={source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })}>{publicStyle ? formatNumber(uiLocale, n) : `[${formatNumber(uiLocale, n)}]`}</a></sup>
   })
   return <div lang={locale} className={publicStyle ? 'space-y-4 leading-relaxed break-words' : undefined}>
     {text.split(/\n\s*\n/).map((paragraph, i) => {
       const heading = /^#{1,3}\s+(.+)$/.exec(paragraph.trim())
-      return heading ? <h3 key={i} className={publicStyle ? 'text-xl font-semibold' : undefined}>{inline(heading[1])}</h3> : <p key={i} style={{ whiteSpace: 'pre-line' }}>{inline(paragraph)}</p>
+      return heading ? <h3 key={i} className={publicStyle ? 'text-[1.3125rem] font-semibold leading-snug' : undefined}>{inline(heading[1])}</h3> : <p key={i} style={{ whiteSpace: 'pre-line' }}>{inline(paragraph)}</p>
     })}
   </div>
 }

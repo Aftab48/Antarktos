@@ -1,27 +1,33 @@
 import type { Metadata } from 'next'
+import { Archivo } from 'next/font/google'
 import { headers } from 'next/headers'
 import type { ReactNode } from 'react'
 
 import { href, otherLocaleHref, translator, type Key } from '@/i18n'
 
 import { pageLocale, type Params } from '../_lib/data'
+import { BrandMark } from '../_lib/ui'
 import '../styles.css'
+
+// Self-hosted at build time (no runtime request to Google). The width axis gives the condensed headings.
+const archivo = Archivo({ subsets: ['latin'], axes: ['wdth'], variable: '--font-archivo', display: 'swap' })
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const t = translator(await pageLocale(params))
   return { title: { template: `%s | ${t('site.name')}`, default: t('site.name') }, description: t('site.tagline'), icons: '/icon.svg' }
 }
 
+// The brand is the home link; About lives in the footer and the mobile menu.
 const NAV: [string, Key][] = [
-  ['/', 'nav.home'],
   ['/expeditions', 'nav.expeditions'],
   ['/stations', 'nav.stations'],
   ['/archive', 'nav.archive'],
   ['/ask', 'nav.ask'],
-  ['/news', 'nav.news'],
   ['/learn', 'nav.learn'],
-  ['/about', 'nav.about'],
+  ['/news', 'nav.news'],
 ]
+const MENU: [string, Key][] = [...NAV, ['/about', 'nav.about']]
+const FOOTER: [string, Key][] = [['/about', 'nav.about'], ['/archive', 'nav.archive'], ['/ask', 'nav.ask'], ['/learn', 'nav.learn'], ['/news', 'nav.news']]
 
 export default async function Layout({ children, params }: { children: ReactNode; params: Params }) {
   const l = await pageLocale(params)
@@ -32,56 +38,101 @@ export default async function Layout({ children, params }: { children: ReactNode
   const path = raw.startsWith('/') && !raw.startsWith('//') ? raw : href(l, '/')
   const bare = path.replace(/^\/hi(?=\/|\?|$)/, '').split('?')[0] || '/'
   const section = '/' + (bare.split('/')[1] ?? '')
+  const current = (p: string) => (section === p ? (bare === p ? 'page' : 'true') : undefined)
+  const toggle = (
+    <a
+      href={otherLocaleHref(l, path)}
+      hrefLang={other}
+      lang={other}
+      className="inline-flex min-h-11 shrink-0 items-center rounded-md border border-frost/60 px-4 font-medium text-snow hover:bg-deep"
+    >
+      {t('lang.switch')}
+    </a>
+  )
 
   return (
-    <html lang={l} dir="ltr">
+    <html lang={l} dir="ltr" className={archivo.variable}>
       <body className="flex min-h-dvh flex-col">
-        <a href="#main" className="sr-only rounded-md bg-background px-4 py-2 shadow focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50">
+        <a href="#main" className="sr-only rounded-md focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-snow focus:px-4 focus:py-3 focus:text-night">
           {t('skip')}
         </a>
-        <header className="portal-header border-t-4 border-t-primary border-b bg-background">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 pt-5">
-            <a href={href(l, '/')} className="portal-brand mr-auto flex items-center gap-3 font-semibold text-primary">
-              {/* Decorative portal mark, not an official government emblem. */}
-              <svg aria-hidden="true" viewBox="0 0 32 32" className="size-11 shrink-0 rounded-lg bg-primary p-2 text-white"><g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M16 3v26M5 9.5l22 13M5 22.5l22-13M12 6l4 3 4-3M12 26l4-3 4 3" /></g></svg>
-              <span><span className="block text-xl">{t('site.name')}</span><span className="mt-1 block text-xs font-normal text-muted-foreground">{t('site.tagline')}</span></span>
+        <header className="relative bg-night text-snow">
+          <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+            <a href={href(l, '/')} className="mr-auto inline-flex min-h-11 items-center gap-3 text-snow no-underline">
+              <BrandMark />
+              <span className="font-display text-2xl">{t('site.name')}</span>
             </a>
-            <a
-              href={otherLocaleHref(l, path)}
-              hrefLang={other}
-              lang={other}
-              className="inline-flex min-h-11 items-center rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted"
-            >
-              {t('lang.switch')}
-            </a>
-            {/* Own row at every width, so the visual order matches the tab order. */}
-            <nav aria-label={t('nav.label')} className="portal-nav mt-3 w-full border-t">
-              <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-                {NAV.map(([p, key]) => {
-                  const current = p === '/' ? bare === '/' : section === p
-                  return (
-                    <li key={p}>
+            <nav aria-label={t('nav.label')} className="hidden lg:flex">
+              <ul className="flex">
+                {NAV.map(([p, key]) => (
+                  <li key={p}>
+                    <a
+                      href={href(l, p)}
+                      aria-current={current(p)}
+                      className="inline-flex min-h-16 items-center px-3 font-medium text-frost no-underline hover:text-snow aria-[current]:text-snow aria-[current]:shadow-[inset_0_-3px_0_var(--signal)]"
+                    >
+                      {t(key)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            {toggle}
+            {/* Native disclosure: keyboard and screen-reader support without script. Tab order = visual order. */}
+            <details className="group lg:hidden">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center rounded-md border border-frost/60 px-4 font-medium text-snow select-none hover:bg-deep group-open:bg-deep [&::-webkit-details-marker]:hidden">
+                {t('nav.menu')}
+              </summary>
+              <nav aria-label={t('nav.label')} className="absolute inset-x-0 top-full z-40 bg-deep">
+                <ul className="mx-auto max-w-6xl px-4 pb-4 sm:px-6">
+                  {MENU.map(([p, key]) => (
+                    <li key={p} className="border-b border-night">
                       <a
                         href={href(l, p)}
-                        aria-current={current ? (bare === p ? 'page' : 'true') : undefined}
-                        className="inline-flex min-h-12 items-center py-2 underline-offset-8 hover:underline aria-[current]:font-semibold aria-[current]:text-primary aria-[current]:underline aria-[current]:decoration-2"
+                        aria-current={current(p)}
+                        className="flex min-h-12 items-center text-lg font-medium text-snow no-underline hover:text-glacier aria-[current]:shadow-[inset_3px_0_0_var(--signal)] aria-[current]:pl-4"
                       >
                         {t(key)}
                       </a>
                     </li>
-                  )
-                })}
-              </ul>
-            </nav>
+                  ))}
+                </ul>
+              </nav>
+            </details>
           </div>
         </header>
-        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 focus:outline-none">
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 pb-20 focus:outline-none sm:px-6 lg:px-8">
           {children}
         </main>
-        <footer className="portal-footer mt-12 border-t bg-muted/60">
-          <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-sm text-muted-foreground">
-            <p>{t('site.sources')}</p>
-            <p>{t('site.disclaimer')}</p>
+        <footer className="bg-night text-frost">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1fr_12rem_minmax(0,1.4fr)] lg:px-8">
+            <div>
+              <a href={href(l, '/')} className="inline-flex min-h-11 items-center gap-3 text-snow no-underline">
+                <BrandMark />
+                <span className="font-display text-2xl">{t('site.name')}</span>
+              </a>
+              <p className="mt-2 max-w-[20rem]">{t('site.tagline')}</p>
+            </div>
+            <nav aria-label={t('nav.footer')}>
+              <ul>
+                {FOOTER.map(([p, key]) => (
+                  <li key={p}>
+                    <a href={href(l, p)} className="inline-flex min-h-11 items-center text-snow no-underline hover:text-glacier hover:underline">
+                      {t(key)}
+                    </a>
+                  </li>
+                ))}
+                <li>
+                  <a href={otherLocaleHref(l, path)} hrefLang={other} lang={other} className="inline-flex min-h-11 items-center text-snow no-underline hover:text-glacier hover:underline">
+                    {t('lang.switch')}
+                  </a>
+                </li>
+              </ul>
+            </nav>
+            <div className="flex flex-col gap-4 text-sm">
+              <p>{t('site.sources')}</p>
+              <p>{t('site.disclaimer')}</p>
+            </div>
           </div>
         </footer>
       </body>

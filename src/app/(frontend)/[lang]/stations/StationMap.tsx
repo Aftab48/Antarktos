@@ -5,6 +5,7 @@ import type { Map as LeafletMap } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { translator, type Locale } from '@/i18n'
 import type { StationPoint } from '../../_lib/station-map'
+import { btnSecondary } from '../../_lib/classes'
 
 export function StationMap({ points, l }: { points: StationPoint[]; l: Locale }) {
   const container = useRef<HTMLDivElement>(null)
@@ -43,18 +44,18 @@ export function StationMap({ points, l }: { points: StationPoint[]; l: Locale })
     return () => { disposed = true; map.current?.remove(); map.current = null }
   }, [points])
 
-  if (!points.length) return <p className="mt-6 rounded-xl border p-5">{t('stations.mapEmpty')}</p>
-  return <section aria-labelledby="station-map-title" className="mt-8 overflow-hidden rounded-xl border bg-card">
-    <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-      <h2 id="station-map-title" className="text-lg font-semibold">{t('stations.mapTitle')}</h2>
+  if (!points.length) return <div className="portal-empty"><p>{t('stations.mapEmpty')}</p><a href="#station-list" className="mt-2 inline-flex min-h-11 items-center font-medium underline">{t('stations.viewList')}</a></div>
+  return <section aria-labelledby="station-map-title" className="overflow-hidden rounded-xl border border-rule bg-snow">
+    <div className="flex flex-wrap items-center justify-between gap-3 p-4 sm:px-6">
+      <h2 id="station-map-title" className="text-[1.3125rem] font-semibold leading-snug">{t('stations.mapTitle')}</h2>
       <div className="flex gap-2">
-        <button className="rounded-md border bg-background px-3 py-2 text-sm" disabled={state !== 'ready'} onClick={() => map.current?.zoomIn()}>{t('stations.zoomIn')}</button>
-        <button className="rounded-md border bg-background px-3 py-2 text-sm" disabled={state !== 'ready'} onClick={() => map.current?.zoomOut()}>{t('stations.zoomOut')}</button>
+        <button type="button" className={btnSecondary} disabled={state !== 'ready'} onClick={() => map.current?.zoomIn()}>{t('stations.zoomIn')}</button>
+        <button type="button" className={btnSecondary} disabled={state !== 'ready'} onClick={() => map.current?.zoomOut()}>{t('stations.zoomOut')}</button>
       </div>
     </div>
-    <p id="station-map-help" className="px-4 pb-4 text-sm text-muted-foreground">{t('stations.mapHelp')} <a href="#station-list" className="underline underline-offset-4">{t('stations.viewList')}</a></p>
-    {state !== 'ready' && <p role="status" className="px-4 pb-4">{t(state === 'loading' ? 'stations.mapLoading' : 'stations.mapError')}</p>}
-    {tileError && <p role="status" className="px-4 pb-4">{t('stations.mapError')}</p>}
-    <div ref={container} aria-label={t('stations.mapTitle')} aria-describedby="station-map-help" className="station-map relative z-0 h-[28rem] bg-muted" />
+    <p id="station-map-help" className="px-4 pb-4 text-sm text-slate sm:px-6">{t('stations.mapHelp')} <a href="#station-list" className="text-night underline">{t('stations.viewList')}</a></p>
+    {state !== 'ready' && <p role="status" className="px-4 pb-4 sm:px-6">{t(state === 'loading' ? 'stations.mapLoading' : 'stations.mapError')}</p>}
+    {tileError && <p role="status" className="px-4 pb-4 sm:px-6">{t('stations.mapError')}</p>}
+    <div ref={container} aria-label={t('stations.mapTitle')} aria-describedby="station-map-help" className="station-map relative z-0 h-[24rem] bg-ice sm:h-[30rem]" />
   </section>
 }

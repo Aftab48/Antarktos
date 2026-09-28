@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { formatNumber, formatYear, translator } from '@/i18n'
 
 import { find, pageLocale, REGIONS, type Doc, type Params } from '../../_lib/data'
-import { ExpeditionList, h1, label } from '../../_lib/ui'
+import { ExpeditionList, h2Base, label, PageHead } from '../../_lib/ui'
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   return { title: translator(await pageLocale(params))('expeditions.title') }
@@ -26,32 +26,30 @@ export default async function Expeditions({ params }: { params: Params }) {
 
   return (
     <>
-      <h1 className={h1}>{t('expeditions.title')}</h1>
-      <p className="mt-3 text-muted-foreground">{t('expeditions.intro')}</p>
-      {regions.length > 1 && (
-        <nav aria-label={t('expeditions.jump')} className="mt-4">
-          <ul className="flex flex-wrap gap-2 text-sm">
-            {regions.map(({ region }) => (
-              <li key={region}>
-                <a href={`#${region}`} className="inline-block rounded-md border px-3 py-1 hover:bg-muted">
-                  {label(l, 'region', region)}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
+      <PageHead title={t('expeditions.title')} intro={t('expeditions.intro')}>
+        {regions.length > 1 && (
+          <nav aria-label={t('expeditions.jump')} className="mt-8">
+            <ul className="flex flex-wrap gap-3">
+              {regions.map(({ region, count }) => (
+                <li key={region}>
+                  <a href={`#${region}`} className="inline-flex min-h-11 items-center gap-2 rounded-md border border-control bg-snow px-4 font-medium no-underline hover:bg-ice">
+                    {label(l, 'region', region)} <span className="font-figures text-slate">{formatNumber(l, count)}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </PageHead>
       {regions.map(({ region, count, decades }) => (
-        <section key={region} id={region} aria-labelledby={`${region}-h`} className="mt-10">
-          <h2 id={`${region}-h`} className="text-2xl font-semibold">
-            {label(l, 'region', region)} <span className="text-muted-foreground">({formatNumber(l, count)})</span>
+        <section key={region} id={region} aria-labelledby={`${region}-h`} className="mb-16 scroll-mt-6">
+          <h2 id={`${region}-h`} className={h2Base}>
+            {label(l, 'region', region)} <span className="font-figures text-slate">{formatNumber(l, count)}</span>
           </h2>
           {decades.map(([decade, docs]) => (
-            <div key={decade} className="mt-6 grid gap-2 sm:grid-cols-[8rem_1fr]">
-              <h3 className="font-semibold text-primary">{decade}</h3>
-              <div className="border-l-2 border-primary/30 pl-5">
-                <ExpeditionList docs={docs} l={l} />
-              </div>
+            <div key={decade} className="mt-10 grid gap-4 sm:grid-cols-[8rem_minmax(0,1fr)]">
+              <h3 className="self-start font-display text-2xl text-slate sm:sticky sm:top-6 sm:text-4xl">{decade}</h3>
+              <ExpeditionList docs={docs} l={l} />
             </div>
           ))}
         </section>

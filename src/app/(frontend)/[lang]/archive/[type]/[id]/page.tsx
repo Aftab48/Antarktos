@@ -2,12 +2,14 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { formatDate, formatNumber, formatYear, href, translator, type Locale } from '@/i18n'
 
 import { findOne, isRecordType, pageLocale, pick, rel, rels, safeUrl, text, type Doc, type Params, type RecordType } from '../../../../_lib/data'
 import {
+  AiNote,
+  BackLink,
+  btn,
+  btnSecondary,
   CitedText,
   coordinates,
   en,
@@ -20,12 +22,15 @@ import {
   L,
   label,
   MediaImage,
+  Meta,
+  PageHead,
   MediaPlayer,
   Paragraphs,
   provenanceFacts,
   recordHref,
   titleOf,
-  typeLabel,
+  TypeMark,
+  whenOf,
 } from '../../../../_lib/ui'
 
 type P = Params<{ type: string; id: string }>
@@ -48,13 +53,10 @@ const megabytes = (l: Locale, bytes?: number) =>
   bytes ? formatNumber(l, bytes / 1e6, { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }) : undefined
 const doiUrl = (doi?: string) => (doi ? (safeUrl(doi) ?? `https://doi.org/${doi.replace(/^doi:\s*/i, '')}`) : undefined)
 
-function ActionLink({ url, children }: { url: unknown; children: ReactNode }) {
+// The first action is the primary button, the rest secondary (spec §9.11).
+function ActionLink({ url, children, primary }: { url: unknown; children: ReactNode; primary?: boolean }) {
   const u = safeUrl(url)
-  return u ? (
-    <Button asChild size="lg">
-      <a href={u}>{children}</a>
-    </Button>
-  ) : null
+  return u ? <a href={u} className={primary ? btn : btnSecondary}>{children}</a> : null
 }
 
 // Record detail for every archive type (plan §15): report, dataset, publication, media, event.
@@ -71,7 +73,7 @@ export default async function RecordPage({ params }: { params: P }) {
     [
       t('field.expedition'),
       expedition && (
-        <a href={href(l, `/expeditions/${expedition.id}`)} className="underline underline-offset-4">
+        <a href={href(l, `/expeditions/${expedition.id}`)} className="underline">
           <L v={expedition.title} l={l} />
         </a>
       ),
@@ -82,7 +84,7 @@ export default async function RecordPage({ params }: { params: P }) {
         <ul>
           {stations.map((s) => (
             <li key={s.id}>
-              <a href={href(l, `/stations/${s.id}`)} className="underline underline-offset-4">
+              <a href={href(l, `/stations/${s.id}`)} className="underline">
                 <L v={s.name} l={l} />
               </a>
             </li>
@@ -96,22 +98,24 @@ export default async function RecordPage({ params }: { params: P }) {
 
   return (
     <article>
-      <a href={href(l, `/archive?type=${type}`)} className="text-sm underline underline-offset-4">
-        {t('nav.archive')} · {t(`type.${type}`)}
-      </a>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Badge>{typeLabel(l, type, doc)}</Badge>
-        {doc.region && <Badge variant="secondary">{label(l, 'region', doc.region)}</Badge>}
-      </div>
-      <L v={titleOf(type, doc)} l={l} as="h1" className={`${type === 'media' ? 'text-2xl font-semibold tracking-tight sm:text-3xl' : h1} mt-3`} />
-      <div className="mt-6">{fallsBack(l, titleOf(type, doc), mainText) && <FallbackNote l={l} />}</div>
+      <PageHead
+        back={<BackLink to={href(l, `/archive?type=${type}`)}>{t(`type.${type}`)}</BackLink>}
+        title={
+          <>
+            <TypeMark l={l} type={type} doc={doc} />
+            <L v={titleOf(type, doc)} l={l} as="h1" className={`${type === 'media' ? 'font-display text-3xl text-balance sm:text-4xl' : h1} mt-3`} />
+            <Meta className="mt-4" items={[whenOf(l, type, doc) && <span className="font-figures">{whenOf(l, type, doc)}</span>, label(l, 'region', doc.region)]} />
+          </>
+        }
+      />
+      {fallsBack(l, titleOf(type, doc), mainText) && <FallbackNote l={l} />}
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
-        <div className="flex min-w-0 max-w-prose flex-col gap-6">
+      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="flex min-w-0 max-w-[65ch] flex-col gap-8">
           {body}
           {actions.some(Boolean) && <div className="flex flex-wrap gap-3">{actions}</div>}
         </div>
-        <aside>
+        <aside className="self-start rounded-xl bg-ice p-6 lg:sticky lg:top-6">
           <Facts items={[...facts, ...linked, ...provenanceFacts(l, doc)]} />
         </aside>
       </div>
@@ -121,12 +125,12 @@ export default async function RecordPage({ params }: { params: P }) {
 
 function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; facts: [string, ReactNode][]; actions: ReactNode[] } {
   const t = translator(l)
-  const aiNote = (key: 'summary.aiNote' | 'media.aiNote') => doc.ai_generated && <p className="text-sm text-muted-foreground">{t(key)}</p>
+  const aiNote = (key: 'summary.aiNote' | 'media.aiNote') => doc.ai_generated && <AiNote>{t(key)}</AiNote>
   switch (type) {
     case 'reports':
       return {
         body: pick(doc.summary, l) && (
-          <section aria-labelledby="summary" className="flex flex-col gap-3">
+          <section aria-labelledby="summary" className="flex flex-col gap-4">
             <h2 id="summary" className={h2}>{t('summary.heading')}</h2>
             <CitedText v={doc.summary} l={l} collection="reports" doc={doc} />
             {aiNote('summary.aiNote')}
@@ -139,7 +143,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.file'), megabytes(l, doc.filesize)],
           [t('field.keywords'), en(l, list(doc.keywords))],
         ],
-        actions: [<ActionLink key="pdf" url={doc.url}>{t('action.openPdf')}</ActionLink>],
+        actions: [<ActionLink key="pdf" primary url={doc.url}>{t('action.openPdf')}</ActionLink>],
       }
     case 'datasets':
       return {
@@ -149,7 +153,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
             {doc.parameters?.length > 0 && (
               <section aria-labelledby="parameters">
                 <h2 id="parameters" className={h2}>{t('field.parameters')}</h2>
-                <ul className="list-disc pl-5" lang={l === 'en' ? undefined : 'en'}>
+                <ul className="list-disc pl-5 text-lg" lang={l === 'en' ? undefined : 'en'}>
                   {doc.parameters.map((p: string) => (
                     <li key={p}>{p}</li>
                   ))}
@@ -169,8 +173,8 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.file'), megabytes(l, doc.filesize)],
         ],
         actions: [
-          doc.filename && <ActionLink key="file" url={doc.url}>{t('action.download')}</ActionLink>,
-          <ActionLink key="portal" url={doc.external_url}>{t('action.dataPortal')}</ActionLink>,
+          doc.filename && <ActionLink key="file" primary url={doc.url}>{t('action.download')}</ActionLink>,
+          <ActionLink key="portal" primary={!doc.filename} url={doc.external_url}>{t('action.dataPortal')}</ActionLink>,
         ],
       }
     case 'publications':
@@ -183,8 +187,8 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.doi'), doc.doi && <ExternalLink url={doiUrl(doc.doi)}>{doc.doi}</ExternalLink>],
         ],
         actions: [
-          <ActionLink key="link" url={doc.link}>{t('action.readPaper')}</ActionLink>,
-          doc.filename && <ActionLink key="pdf" url={doc.url}>{t('action.openPdf')}</ActionLink>,
+          <ActionLink key="link" primary url={doc.link}>{t('action.readPaper')}</ActionLink>,
+          doc.filename && <ActionLink key="pdf" primary={!safeUrl(doc.link)} url={doc.url}>{t('action.openPdf')}</ActionLink>,
         ],
       }
     case 'media':
@@ -213,7 +217,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
               <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {media.map((m) => (
                   <li key={m.id}>
-                    <a href={recordHref(l, 'media', m.id)} className="block overflow-hidden rounded-lg">
+                    <a href={recordHref(l, 'media', m.id)} className="block overflow-hidden rounded-xl">
                       <MediaImage m={m} l={l} sizes="(min-width: 640px) 14rem, 45vw" className="aspect-square w-full object-cover" />
                     </a>
                   </li>

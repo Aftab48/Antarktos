@@ -3,12 +3,12 @@ import config from '@payload-config'
 import { connection } from 'next/server'
 import { getPayload, type Where } from 'payload'
 
-import { Button } from '@/components/ui/button'
 import { formatNumber, href, translator } from '@/i18n'
 import { searchArchive } from '@/search/database'
 
 import { find, isRecordType, pageLocale, RECORD_SORT, RECORD_TYPES, REGIONS, pick, text, type Doc, type Params, type RecordType } from '../../_lib/data'
-import { h1, h2, label, LinkedRecords, RecordGrid } from '../../_lib/ui'
+import { rowFocus } from '../../_lib/classes'
+import { btn, btnSecondary, Empty, Glyph, glyphOf, h3, label, LinkedRecords, PageHead, RecordGrid, typeLabel } from '../../_lib/ui'
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   return { title: translator(await pageLocale(params))('archive.title') }
@@ -69,104 +69,98 @@ export default async function Archive({ params, searchParams }: { params: Params
   const groups = Array.isArray(results) ? RECORD_TYPES.map((c, i) => ({ type: c, docs: results[i].docs as Doc[], total: results[i].totalDocs })) : []
   const total = ranked ? ranked.total : list ? list.totalDocs : groups.reduce((n, g) => n + g.total, 0)
   const totalPages = ranked ? Math.ceil(ranked.total / ranked.pageSize) : list?.totalPages ?? 0
-  const select = 'mt-1 block w-full rounded-md border bg-background px-2 py-1.5 text-sm'
+  const select = 'mt-1 block min-h-11 w-full rounded-md border border-control bg-snow px-3 font-normal'
+  const pager = (hasPrev: boolean, hasNext: boolean, pages: number) => (
+    <nav aria-label={t('archive.pagination')} className="mt-10 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <span>{hasPrev && <a href={href(l, `/archive?${query({ ...f, page: page - 1 })}`)} className={btnSecondary}>{t('archive.prev')}</a>}</span>
+      <span className="font-figures text-sm text-slate">{t('archive.pageOf', { page: formatNumber(l, page), total: formatNumber(l, pages) })}</span>
+      <span className="text-right">{hasNext && <a href={href(l, `/archive?${query({ ...f, page: page + 1 })}`)} className={btnSecondary}>{t('archive.next')}</a>}</span>
+    </nav>
+  )
+  const clear = <Empty message={t(f.q ? 'archive.searchEmpty' : 'archive.empty')} action={t('archive.reset')} to={href(l, '/archive')} />
 
   return (
     <>
-      <h1 className={h1}>{t('archive.title')}</h1>
-      <p className="mt-3 text-muted-foreground">{t('archive.intro')}</p>
-      <a href={href(l, '/ask')} className="mt-3 inline-block text-sm underline underline-offset-4">{t('ask.title')}</a>
+      <PageHead title={t('archive.title')} intro={t('archive.intro')}>
+        <form method="get" action={href(l, '/archive')} className="mt-10" aria-labelledby="filters-h">
+          <h2 id="filters-h" className="sr-only">{t('archive.filters')}</h2>
+          <label htmlFor="archive-q" className="block font-semibold">{t('archive.search')}</label>
+          <input id="archive-q" name="q" type="search" defaultValue={f.q} maxLength={300} className="mt-2 h-14 w-full rounded-md border border-control bg-snow px-4 text-lg" aria-describedby="search-hint" />
+          <p id="search-hint" className="mt-2 text-sm text-slate">{t('archive.searchHint')}</p>
+          <div className="mt-6 grid gap-4 text-sm font-medium sm:grid-cols-2 lg:grid-cols-[1fr_1fr_8rem_1.5fr_1.5fr]">
+            <label>
+              {t('field.type')}
+              <select name="type" defaultValue={type ?? ''} className={select}>
+                <option value="">{t('archive.all')}</option>
+                {RECORD_TYPES.map((c) => (
+                  <option key={c} value={c}>{t(`type.${c}`)}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('field.region')}
+              <select name="region" defaultValue={f.region ?? ''} className={select}>
+                <option value="">{t('archive.all')}</option>
+                {REGIONS.map((r) => (
+                  <option key={r} value={r}>{label(l, 'region', r)}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('field.year')}
+              <input name="year" type="number" inputMode="numeric" min={1900} max={2100} defaultValue={f.year ?? ''} className={select} />
+            </label>
+            <label>
+              {t('field.expedition')}
+              <select name="expedition" defaultValue={f.expedition ?? ''} className={select}>
+                <option value="">{t('archive.all')}</option>
+                {expeditions.docs.map((d: Doc) => (
+                  <option key={d.id} value={d.id} lang={pick(d.title, l)?.lang}>{text(d.title, l)}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('field.stations')}
+              <select name="station" defaultValue={f.station ?? ''} className={select}>
+                <option value="">{t('archive.all')}</option>
+                {stations.docs.map((d: Doc) => (
+                  <option key={d.id} value={d.id} lang={pick(d.name, l)?.lang}>{text(d.name, l)}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <button type="submit" className={btn}>{t('archive.searchApply')}</button>
+            <a href={href(l, '/archive')} className="inline-flex min-h-11 items-center underline">{t('archive.reset')}</a>
+            <a href={href(l, '/ask')} className="inline-flex min-h-11 items-center underline sm:ml-auto">{t('ask.title')}</a>
+          </div>
+        </form>
+      </PageHead>
 
-      <form method="get" action={href(l, '/archive')} className="mt-6 rounded-xl border p-4" aria-labelledby="filters-h">
-        <h2 id="filters-h" className="sr-only">{t('archive.filters')}</h2>
-        <label className="mb-4 block text-sm font-medium">
-          {t('archive.search')}
-          <input name="q" type="search" defaultValue={f.q} maxLength={300} className={select} aria-describedby="search-hint" />
-        </label>
-        <p id="search-hint" className="mb-4 text-sm text-muted-foreground">{t('archive.searchHint')}</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <label className="text-sm font-medium">
-            {t('field.type')}
-            <select name="type" defaultValue={type ?? ''} className={select}>
-              <option value="">{t('archive.all')}</option>
-              {RECORD_TYPES.map((c) => (
-                <option key={c} value={c}>{t(`type.${c}`)}</option>
-              ))}
-            </select>
-          </label>
-          <label className="text-sm font-medium">
-            {t('field.region')}
-            <select name="region" defaultValue={f.region ?? ''} className={select}>
-              <option value="">{t('archive.all')}</option>
-              {REGIONS.map((r) => (
-                <option key={r} value={r}>{label(l, 'region', r)}</option>
-              ))}
-            </select>
-          </label>
-          <label className="text-sm font-medium">
-            {t('field.year')}
-            <input name="year" type="number" inputMode="numeric" min={1900} max={2100} defaultValue={f.year ?? ''} className={select} />
-          </label>
-          <label className="text-sm font-medium">
-            {t('field.expedition')}
-            <select name="expedition" defaultValue={f.expedition ?? ''} className={select}>
-              <option value="">{t('archive.all')}</option>
-              {expeditions.docs.map((d: Doc) => (
-                <option key={d.id} value={d.id} lang={pick(d.title, l)?.lang}>{text(d.title, l)}</option>
-              ))}
-            </select>
-          </label>
-          <label className="text-sm font-medium">
-            {t('field.stations')}
-            <select name="station" defaultValue={f.station ?? ''} className={select}>
-              <option value="">{t('archive.all')}</option>
-              {stations.docs.map((d: Doc) => (
-                <option key={d.id} value={d.id} lang={pick(d.name, l)?.lang}>{text(d.name, l)}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center gap-4">
-          <Button type="submit">{t('archive.searchApply')}</Button>
-          <a href={href(l, '/archive')} className="text-sm underline underline-offset-4">{t('archive.reset')}</a>
-        </div>
-      </form>
-
-      <section aria-labelledby="results-h" className="mt-10">
-        <h2 id="results-h" className={h2}>{t('archive.results', { count: formatNumber(l, total) })}</h2>
-        {invalidQuery ? <p role="alert">{t('ask.invalid')}</p> : ranked ? (
+      <section aria-labelledby="results-h">
+        <h2 id="results-h" className="mb-6 font-display text-2xl">{t('archive.results', { count: formatNumber(l, total) })}</h2>
+        {invalidQuery ? <p role="alert" className="font-medium text-alert">{t('ask.invalid')}</p> : ranked ? (
           ranked.results.length ? <>
-            <ol className="grid gap-4">
-              {ranked.results.map((result) => <li key={`${result.collection}:${result.docId}`} className="rounded-xl border p-5">
-                <p className="mb-2 text-sm text-muted-foreground">{label(l, 'type', result.collection)}{result.page ? ` · ${t('summary.page', { page: formatNumber(l, result.page) })}` : ''}</p>
-                <h3 className="text-lg font-semibold"><a href={result.url} lang={result.titleLocale} className="underline underline-offset-4">{result.title}</a></h3>
-                <p lang={result.locale} className="mt-3 leading-relaxed text-muted-foreground">{result.snippet}</p>
+            <ol>
+              {ranked.results.map((result) => <li key={`${result.collection}:${result.docId}`} className={`relative -mx-3 grid gap-2 border-t border-rule px-3 py-6 last:border-b hover:bg-ice/60 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8 ${rowFocus}`}>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm sm:flex-col sm:items-start">
+                  <span className="inline-flex items-center gap-1.5 font-medium">{isRecordType(result.collection) ? <><Glyph kind={glyphOf(result.collection, {})} />{typeLabel(l, result.collection, {})}</> : label(l, 'type', result.collection)}</span>
+                  {result.page ? <span className="font-figures text-slate">{t('summary.page', { page: formatNumber(l, result.page) })}</span> : null}
+                </div>
+                <div className="min-w-0">
+                  <h3 className={h3}><a href={result.url} lang={result.titleLocale} className="underline decoration-transparent after:absolute after:inset-0 hover:decoration-night focus-visible:outline-none">{result.title}</a></h3>
+                  <p lang={result.locale} className="mt-2 line-clamp-3 text-slate">{result.snippet}</p>
+                </div>
               </li>)}
             </ol>
-            {totalPages > 1 && <nav aria-label={t('archive.pagination')} className="mt-8 flex items-center justify-between gap-4 text-sm">
-              {page > 1 ? <a href={href(l, `/archive?${query({ ...f, page: page - 1 })}`)} className="underline underline-offset-4">{t('archive.prev')}</a> : <span />}
-              <span>{t('archive.pageOf', { page: formatNumber(l, page), total: formatNumber(l, totalPages) })}</span>
-              {page < totalPages ? <a href={href(l, `/archive?${query({ ...f, page: page + 1 })}`)} className="underline underline-offset-4">{t('archive.next')}</a> : <span />}
-            </nav>}
-          </> : <p className="text-muted-foreground">{t('archive.searchEmpty')}</p>
+            {totalPages > 1 && pager(page > 1, page < totalPages, totalPages)}
+          </> : clear
         ) : !list || !type ? (
-          <LinkedRecords groups={groups} l={l} archiveQuery={query(rest)} empty={t('archive.empty')} />
-        ) : total === 0 ? (
-          <p className="portal-empty">{t('archive.empty')}</p>
-        ) : (
+          <LinkedRecords groups={groups} l={l} archiveQuery={query(rest)} empty={t('archive.empty')} emptyAction={[t('archive.reset'), href(l, '/archive')]} />
+        ) : total === 0 ? clear : (
           <>
             <RecordGrid type={type} docs={list.docs as Doc[]} l={l} />
-            {list.totalPages > 1 && (
-              <nav aria-label={t('archive.pageOf', { page, total: list.totalPages })} className="mt-8 flex items-center justify-between gap-4 text-sm">
-                {list.hasPrevPage ? (
-                  <a href={href(l, `/archive?${query({ ...f, page: page - 1 })}`)} className="underline underline-offset-4">{t('archive.prev')}</a>
-                ) : <span />}
-                <span className="text-muted-foreground">{t('archive.pageOf', { page, total: list.totalPages })}</span>
-                {list.hasNextPage ? (
-                  <a href={href(l, `/archive?${query({ ...f, page: page + 1 })}`)} className="underline underline-offset-4">{t('archive.next')}</a>
-                ) : <span />}
-              </nav>
-            )}
+            {list.totalPages > 1 && pager(list.hasPrevPage, list.hasNextPage, list.totalPages)}
           </>
         )}
       </section>

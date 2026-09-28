@@ -1,5 +1,6 @@
 function Mark() {
-  return <svg aria-hidden="true" viewBox="0 0 32 32" className="science-mark"><g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M16 3v26M5 9.5l22 13M5 22.5l22-13M12 6l4 3 4-3M12 26l4-3 4 3" /></g></svg>
+  // Same meridian mark as the public site and public/icon.svg: globe, pole-to-pole line, station pin.
+  return <svg aria-hidden="true" viewBox="0 0 32 32" className="science-mark"><circle cx="16" cy="16" r="11.5" fill="none" stroke="currentColor" strokeWidth="2.5" /><path d="M16 4.5v23" stroke="currentColor" strokeWidth="2.5" /><circle cx="16" cy="23" r="4" fill="#E4500E" /></svg>
 }
 
 export function PortalLogo() {

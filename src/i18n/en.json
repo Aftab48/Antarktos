@@ -215,5 +215,17 @@
   "stations.mapEmpty": "No published station coordinates are available yet.",
   "stations.zoomIn": "Zoom in",
   "stations.zoomOut": "Zoom out",
-  "outreach.downloadCard": "Download Instagram card"
+  "outreach.downloadCard": "Download Instagram card",
+  "nav.menu": "Menu",
+  "nav.footer": "Site",
+  "archive.searchSubmit": "Search",
+  "home.meridian": "India's research stations by latitude, from {north} to {south}.",
+  "home.catalogue": "What's in the archive",
+  "home.catalogueIntro": "Every record lists its source, license and credit.",
+  "home.expeditionsSince": "{count} expeditions since {year}",
+  "home.learnStart": "Start learning",
+  "geo.equator": "Equator",
+  "geo.arcticCircle": "Arctic Circle",
+  "geo.antarcticCircle": "Antarctic Circle",
+  "geo.india": "India"
 }
