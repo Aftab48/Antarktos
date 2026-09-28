@@ -1,6 +1,6 @@
 // Write data/seed/expeditions.json and data/seed/stations.json from public sources
 // (Wikipedia CC BY-SA, NCPOR). No invented values: a field is left null/empty when
-// the source doesn't give it (e.g. Himansh's exact coordinates, or the 26th/27th
+// the source doesn't give it (e.g. the 26th/27th
 // expedition's season dates, or per-expedition station assignments before Bharati
 // existed in 2012 — the source table doesn't break that down).
 //
@@ -11,7 +11,8 @@
 //   https://en.wikipedia.org/wiki/Himadri_(research_station)
 //   https://en.wikipedia.org/wiki/Dakshin_Gangotri
 //   https://en.wikipedia.org/wiki/National_Centre_for_Polar_and_Ocean_Research (Himansh section)
-//   https://ncpor.res.in/pages/display/268-himalaya (Himansh, confirms no public lat/lng)
+//   https://ncpor.res.in/pages/display/268-himalaya (Himansh)
+//   https://ncpor.res.in/pages/view/115/426-himansh (Himansh lat/lng)
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
@@ -156,8 +157,9 @@ function buildStations() {
     {
       name: 'Himansh',
       region: 'himalaya',
-      lat: null, // no public lat/lng on NCPOR's own page — left empty, not invented
-      lng: null,
+      // NCPOR's Himansh page (ncpor.res.in/pages/view/115/426-himansh): 32°24'34" N, 77°36'32" E
+      lat: 32.4094,
+      lng: 77.6089,
       established: 2016,
       decommissioned: null,
       status: 'active',
