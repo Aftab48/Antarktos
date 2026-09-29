@@ -22,7 +22,7 @@ export function StationMap({ points, l }: { points: StationPoint[]; l: Locale })
       map.current = instance
       instance.attributionControl.setPrefix(false)
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a lang="en" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        attribution: '&copy; <a lang="en" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
         maxZoom: 19,
       }).on('tileerror', () => { if (!disposed) setTileError(true) }).addTo(instance)
       for (const point of points) {

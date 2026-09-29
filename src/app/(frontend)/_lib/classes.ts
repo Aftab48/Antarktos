@@ -10,6 +10,10 @@ export const btn =
 export const btnSecondary =
   'inline-flex min-h-11 items-center justify-center rounded-md border border-control bg-snow px-5 text-center font-semibold text-night no-underline hover:bg-ice disabled:cursor-not-allowed disabled:opacity-60'
 
+// Links that leave the page's flow (other sites, PDFs and files, cited sources) open in a new tab, so readers keep
+// their place; each also tells screen readers so (GIGW). Internal navigation stays in the same tab.
+export const newTab = { target: '_blank', rel: 'noopener noreferrer' } as const
+
 // Numbered source tiles: record summaries, ask answers, outreach posts (spec §9.8).
 export const sourceList = 'mt-4 divide-y divide-rule border-y border-rule'
 export const sourceItem = 'grid scroll-mt-24 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-4 py-4'

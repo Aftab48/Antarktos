@@ -268,5 +268,6 @@
   "dataset.preview": "डेटा की झलक",
   "dataset.previewNote": "फ़ाइल की पहली {rows} पंक्तियाँ ({cols} कॉलम)। पूरे डेटा के लिए फ़ाइल डाउनलोड करें।",
   "dataset.chart": "{x} के अनुसार {y}, नीचे दी गई पंक्तियों से",
-  "dataset.chartLabel": "{from} से {to} तक {x} के अनुसार {y} का रेखा चार्ट। मान {min} से {max} तक हैं।"
+  "dataset.chartLabel": "{from} से {to} तक {x} के अनुसार {y} का रेखा चार्ट। मान {min} से {max} तक हैं।",
+  "link.newTab": "नए टैब में खुलता है"
 }

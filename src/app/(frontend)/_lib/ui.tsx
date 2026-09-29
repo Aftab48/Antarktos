@@ -5,12 +5,12 @@ import type { CSSProperties, ElementType, ReactNode } from 'react'
 import { formatDate, formatNumber, formatYear, href, translator, type Key, type Locale } from '@/i18n'
 import { citedIds, stripMarkers } from '@/pipeline/text'
 
-import { h1, h3, rowFocus, sourceItem, sourceList, sourceNum } from './classes'
+import { h1, h3, newTab, rowFocus, sourceItem, sourceList, sourceNum } from './classes'
 import { citedPages, pick, rel, safeUrl, type Doc, type RecordType } from './data'
 import { latY, spreadLabels } from './meridian'
 import { stationPoints } from './station-map'
 
-export { btn, btnSecondary, h1, h2, h2Base, h3 } from './classes'
+export { btn, btnSecondary, h1, h2, h2Base, h3, newTab } from './classes'
 
 // Localized text; marks `lang` when it isn't the page's language (a Hindi page showing English content).
 export function L({ v, l, as: Tag = 'span', className }: { v: unknown; l: Locale; as?: ElementType; className?: string }) {
@@ -113,12 +113,18 @@ export function Facts({ items }: { items: [string, ReactNode][] }) {
   )
 }
 
-export function ExternalLink({ url, children }: { url: unknown; children?: ReactNode }) {
+// Screen-reader note for a link that opens in a new tab.
+export const NewTabNote = ({ l }: { l: Locale }) => <span className="sr-only"> ({translator(l)('link.newTab')})</span>
+
+// A link to another site: new tab, with a small arrow that says so visually.
+export function ExternalLink({ url, l, children }: { url: unknown; l: Locale; children?: ReactNode }) {
   const u = safeUrl(url)
   if (!u) return null
   return (
-    <a href={u} className="underline" rel="noopener noreferrer">
+    <a href={u} className="underline" {...newTab}>
       {children ?? u}
+      <svg aria-hidden="true" viewBox="0 0 16 16" className="ml-1 inline size-3 align-baseline" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h7v7M13 3 4 12" /></svg>
+      <NewTabNote l={l} />
     </a>
   )
 }
@@ -128,7 +134,7 @@ export function provenanceFacts(l: Locale, doc: Doc): [string, ReactNode][] {
   const t = translator(l)
   return [
     // The site name, not the whole URL: the link itself still goes to the page.
-    [t('field.source'), safeUrl(doc.source_url) && <ExternalLink url={doc.source_url}>{en(l, new URL(doc.source_url).hostname.replace(/^www\./, ''))}</ExternalLink>],
+    [t('field.source'), safeUrl(doc.source_url) && <ExternalLink url={doc.source_url} l={l}>{en(l, new URL(doc.source_url).hostname.replace(/^www\./, ''))}</ExternalLink>],
     [t('field.license'), en(l, doc.license)],
     [t('field.credit'), en(l, doc.credit)],
   ]
@@ -366,8 +372,9 @@ export async function CitedText({ v, l, collection, doc }: { v: unknown; l: Loca
       <sup key={key}>
         <a
           href={page ? `${doc.url}#page=${page}` : doc.url}
+          {...newTab}
           lang={l}
-          aria-label={page ? t('summary.citeLabel', { n, page }) : t('summary.citeLabelNoPage', { n })}
+          aria-label={`${page ? t('summary.citeLabel', { n, page }) : t('summary.citeLabelNoPage', { n })} (${t('link.newTab')})`}
           className="citation-link"
         >
           {formatNumber(l, n)}
@@ -389,9 +396,10 @@ export async function CitedText({ v, l, collection, doc }: { v: unknown; l: Loca
             {[...numbers].map(([id, n]) => (
               <li key={id} className={sourceItem}>
                 <span aria-hidden="true" className={sourceNum}>{formatNumber(l, n)}</span>
-                <a href={pages.get(id) ? `${doc.url}#page=${pages.get(id)}` : doc.url} className="font-semibold underline">
+                <a href={pages.get(id) ? `${doc.url}#page=${pages.get(id)}` : doc.url} className="font-semibold underline" {...newTab}>
                   <span className="sr-only">{t('ask.source', { n })}: </span>
                   {pages.get(id) ? t('summary.page', { page: formatNumber(l, pages.get(id)!) }) : t('field.file')}
+                  <NewTabNote l={l} />
                 </a>
               </li>
             ))}

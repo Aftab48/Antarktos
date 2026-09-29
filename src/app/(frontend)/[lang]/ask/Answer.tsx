@@ -1,6 +1,6 @@
 import { formatNumber, href, translator, type Locale } from '@/i18n'
 import type { AskAnswer } from '@/search/types'
-import { sourceItem, sourceList, sourceNum } from '../../_lib/classes'
+import { newTab, sourceItem, sourceList, sourceNum } from '../../_lib/classes'
 
 // Only known citation markers become links. React escapes all source and answer text.
 export function Answer({ answer, locale }: { answer: AskAnswer; locale: Locale }) {
@@ -22,7 +22,8 @@ export function Answer({ answer, locale }: { answer: AskAnswer; locale: Locale }
         {answer.sources.map((source, index) => <li key={source.chunkId} id={`source-${source.chunkId}`} tabIndex={-1} className={`${sourceItem} focus:bg-ice focus:outline-3 focus:outline-signal target:bg-ice target:outline-3 target:outline-signal`}>
           <span aria-hidden="true" className={sourceNum}>{formatNumber(locale, index + 1)}</span>
           <div className="min-w-0">
-            <a href={source.url} lang={source.titleLocale} className="font-semibold underline"><span className="sr-only">{t('ask.source', { n: formatNumber(locale, index + 1) })}: </span>{source.title}</a>
+            {/* New tab: the answer lives only on this page and would be lost by navigating away. */}
+            <a href={source.url} lang={source.titleLocale} className="font-semibold underline" {...newTab}><span className="sr-only">{t('ask.source', { n: formatNumber(locale, index + 1) })}: </span>{source.title}<span className="sr-only"> ({t('link.newTab')})</span></a>
             {source.page ? <p className="text-sm text-slate">{t('summary.page', { page: formatNumber(locale, source.page) })}</p> : null}
           </div>
         </li>)}

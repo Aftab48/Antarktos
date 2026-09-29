@@ -9,7 +9,8 @@ export function CitationText({ text, sources, locale, uiLocale = locale, publicS
     const source = sources.find((s) => s.id === part.id)
     if (!source) return null
     const n = sources.indexOf(source) + 1
-    return <sup key={index}><a className="citation-link" href={source.pageUrl ?? source.recordUrl} lang={uiLocale} aria-label={source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })}>{publicStyle ? formatNumber(uiLocale, n) : `[${formatNumber(uiLocale, n)}]`}</a></sup>
+    // A cited source opens in a new tab, so the reader (or a quiz in progress) keeps their place.
+    return <sup key={index}><a className="citation-link" href={source.pageUrl ?? source.recordUrl} target="_blank" rel="noopener noreferrer" lang={uiLocale} aria-label={`${source.page ? t('summary.citeLabel', { n, page: source.page }) : t('outreach.citation', { n })} (${t('link.newTab')})`}>{publicStyle ? formatNumber(uiLocale, n) : `[${formatNumber(uiLocale, n)}]`}</a></sup>
   })
   return <div lang={locale} className={publicStyle ? 'space-y-4 leading-relaxed break-words' : undefined}>
     {text.split(/\n\s*\n/).map((paragraph, i) => {

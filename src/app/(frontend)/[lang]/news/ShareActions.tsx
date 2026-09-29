@@ -21,13 +21,13 @@ export function ShareActions({ post, l }: { post: Post; l: Locale }) {
   return <section aria-label={t('outreach.share')} className="my-8 rounded-xl bg-ice p-5">
     <div className="flex flex-wrap gap-3">
       <button type="button" className={btnSecondary} onClick={copy}>{t('outreach.copy')}</button>
-      {post.platform === 'x' && <a className={btnSecondary} href={xIntent(copyText({ body: post.body, hashtags: post.hashtags }))} target="_blank" rel="noopener noreferrer">{t('outreach.shareX')}</a>}
+      {post.platform === 'x' && <a className={btnSecondary} href={xIntent(copyText({ body: post.body, hashtags: post.hashtags }))} target="_blank" rel="noopener noreferrer">{t('outreach.shareX')}<span className="sr-only"> ({t('link.newTab')})</span></a>}
       {post.platform === 'linkedin' && <button type="button" className={btnSecondary} onClick={shareLinkedIn}>{t('outreach.shareLinkedIn')}</button>}
       {post.platform === 'instagram' && !!post.suggested_media && <a className={btnSecondary} href={`/api/outreach-image/${post.id}`}>{t('outreach.downloadImage')}</a>}
       {post.cardAvailable && <a className={btnSecondary} href={`/api/instagram-card/${post.id}`}>{t('outreach.downloadCard')}</a>}
     </div>
     {post.platform === 'linkedin' && <p className="mt-3 text-sm text-slate">{t('outreach.linkedInHint')}</p>}
-    {post.platform === 'x' && !!post.thread?.length && <div className="mt-3 flex flex-wrap gap-3">{post.thread.slice(1).map((item, i) => <a key={i} className="inline-flex min-h-11 items-center text-sm underline" href={xIntent(copyText({ body: item.text }))} target="_blank" rel="noopener noreferrer">{t('outreach.shareThread', { n: i + 2 })}</a>)}</div>}
+    {post.platform === 'x' && !!post.thread?.length && <div className="mt-3 flex flex-wrap gap-3">{post.thread.slice(1).map((item, i) => <a key={i} className="inline-flex min-h-11 items-center text-sm underline" href={xIntent(copyText({ body: item.text }))} target="_blank" rel="noopener noreferrer">{t('outreach.shareThread', { n: i + 2 })}<span className="sr-only"> ({t('link.newTab')})</span></a>)}</div>}
     <p role="status" aria-live="polite" className="mt-2 text-sm">{message}</p>
     {manualCopy && <label className="mt-2 block text-sm">{t('outreach.copy')}<textarea lang={post.language ?? l} readOnly value={text} onFocus={(e) => e.target.select()} rows={7} className="mt-2 w-full rounded-md border border-control bg-snow p-3" /></label>}
   </section>

@@ -6,8 +6,8 @@ import { outreachCitations } from '@/outreach/citation-data'
 import { copyText, type CitationSource } from '@/outreach/presentation'
 import { cardInput } from '@/outreach/instagram-card'
 import { type Doc, rel } from './data'
-import { sourceItem, sourceList, sourceNum } from './classes'
-import { en, h1, h3, MediaImage, Meta, Reviewed } from './ui'
+import { newTab, sourceItem, sourceList, sourceNum } from './classes'
+import { en, h1, h3, MediaImage, Meta, NewTabNote, Reviewed } from './ui'
 import { ShareActions } from '../[lang]/news/ShareActions'
 
 export const platformLabel = (l: Locale, platform: string) => translator(l)(`platform.${platform}` as Key)
@@ -31,8 +31,8 @@ export function Sources({ sources, l }: { sources: CitationSource[]; l: Locale }
   return <section aria-labelledby="outreach-sources" className="mt-12"><h2 id="outreach-sources" className={h3}>{t('summary.sources')}</h2>
     {sources.length ? <ol className={sourceList}>{sources.map((s, index) => <li key={s.id} id={`source-${s.id}`} className={`${sourceItem} target:bg-ice`}>
       <span aria-hidden="true" className={sourceNum}>{formatNumber(l, index + 1)}</span>
-      <div className="min-w-0"><a href={s.recordUrl} lang={s.titleLocale} className="font-semibold underline"><span className="sr-only">{t('ask.source', { n: index + 1 })}: </span>{s.title}</a>
-      {s.pageUrl && <a href={s.pageUrl} className="ml-4 text-sm text-slate underline">{t('summary.page', { page: formatNumber(l, s.page!) })}</a>}</div>
+      <div className="min-w-0"><a href={s.recordUrl} lang={s.titleLocale} className="font-semibold underline" {...newTab}><span className="sr-only">{t('ask.source', { n: index + 1 })}: </span>{s.title}<NewTabNote l={l} /></a>
+      {s.pageUrl && <a href={s.pageUrl} className="ml-4 text-sm text-slate underline" {...newTab}>{t('summary.page', { page: formatNumber(l, s.page!) })}<NewTabNote l={l} /></a>}</div>
     </li>)}</ol> : <p className="mt-4 text-slate">{t('outreach.sourcesUnavailable')}</p>}
   </section>
 }

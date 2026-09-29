@@ -25,6 +25,8 @@ import {
   Meta,
   PageHead,
   MediaPlayer,
+  newTab,
+  NewTabNote,
   Paragraphs,
   provenanceFacts,
   recordHref,
@@ -54,10 +56,10 @@ const megabytes = (l: Locale, bytes?: number) =>
   bytes ? formatNumber(l, bytes / 1e6, { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }) : undefined
 const doiUrl = (doi?: string) => (doi ? (safeUrl(doi) ?? `https://doi.org/${doi.replace(/^doi:\s*/i, '')}`) : undefined)
 
-// The first action is the primary button, the rest secondary (spec §9.11).
-function ActionLink({ url, children, primary }: { url: unknown; children: ReactNode; primary?: boolean }) {
+// The first action is the primary button, the rest secondary (spec §9.11). Files and other sites: new tab.
+function ActionLink({ url, l, children, primary }: { url: unknown; l: Locale; children: ReactNode; primary?: boolean }) {
   const u = safeUrl(url)
-  return u ? <a href={u} className={primary ? btn : btnSecondary}>{children}</a> : null
+  return u ? <a href={u} className={primary ? btn : btnSecondary} {...newTab}>{children}<NewTabNote l={l} /></a> : null
 }
 
 // Record detail for every archive type (plan §15): report, dataset, publication, media, event.
@@ -144,7 +146,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.file'), megabytes(l, doc.filesize)],
           [t('field.keywords'), en(l, list(doc.keywords))],
         ],
-        actions: [<ActionLink key="pdf" primary url={doc.url}>{t('action.openPdf')}</ActionLink>],
+        actions: [<ActionLink key="pdf" l={l} primary url={doc.url}>{t('action.openPdf')}</ActionLink>],
       }
     case 'datasets':
       return {
@@ -169,14 +171,14 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.temporal'), doc.temporal_from && [doc.temporal_from, doc.temporal_to].filter(Boolean).map((d) => formatDate(l, d)).join(' – ')],
           [t('field.bbox'), doc.bbox?.south != null && `${coordinates(l, doc.bbox.south, doc.bbox.west)} – ${coordinates(l, doc.bbox.north, doc.bbox.east)}`],
           [t('field.format'), en(l, doc.format)],
-          [t('field.doi'), doc.doi && <ExternalLink url={doiUrl(doc.doi)}>{doc.doi}</ExternalLink>],
+          [t('field.doi'), doc.doi && <ExternalLink url={doiUrl(doc.doi)} l={l}>{doc.doi}</ExternalLink>],
           [t('field.contact'), en(l, doc.contact)],
           [t('field.keywords'), en(l, list(doc.keywords))],
           [t('field.file'), megabytes(l, doc.filesize)],
         ],
         actions: [
-          doc.filename && <ActionLink key="file" primary url={doc.url}>{t('action.download')}</ActionLink>,
-          <ActionLink key="portal" primary={!doc.filename} url={doc.external_url}>{t('action.dataPortal')}</ActionLink>,
+          doc.filename && <ActionLink key="file" l={l} primary url={doc.url}>{t('action.download')}</ActionLink>,
+          <ActionLink key="portal" l={l} primary={!doc.filename} url={doc.external_url}>{t('action.dataPortal')}</ActionLink>,
         ],
       }
     case 'publications':
@@ -186,11 +188,11 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.authors'), en(l, list(doc.authors))],
           [t('field.venue'), en(l, doc.venue)],
           [t('field.year'), doc.year && formatYear(l, doc.year)],
-          [t('field.doi'), doc.doi && <ExternalLink url={doiUrl(doc.doi)}>{doc.doi}</ExternalLink>],
+          [t('field.doi'), doc.doi && <ExternalLink url={doiUrl(doc.doi)} l={l}>{doc.doi}</ExternalLink>],
         ],
         actions: [
-          <ActionLink key="link" primary url={doc.link}>{t('action.readPaper')}</ActionLink>,
-          doc.filename && <ActionLink key="pdf" primary={!safeUrl(doc.link)} url={doc.url}>{t('action.openPdf')}</ActionLink>,
+          <ActionLink key="link" l={l} primary url={doc.link}>{t('action.readPaper')}</ActionLink>,
+          doc.filename && <ActionLink key="pdf" l={l} primary={!safeUrl(doc.link)} url={doc.url}>{t('action.openPdf')}</ActionLink>,
         ],
       }
     case 'media':

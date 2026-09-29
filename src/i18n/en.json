@@ -268,5 +268,6 @@
   "dataset.preview": "Data preview",
   "dataset.previewNote": "The first {rows} rows of the file ({cols} columns). Download the file for the full data.",
   "dataset.chart": "{y} by {x}, from the rows shown below",
-  "dataset.chartLabel": "Line chart of {y} by {x} from {from} to {to}. Values range from {min} to {max}."
+  "dataset.chartLabel": "Line chart of {y} by {x} from {from} to {to}. Values range from {min} to {max}.",
+  "link.newTab": "opens in a new tab"
 }
