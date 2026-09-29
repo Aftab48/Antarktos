@@ -42,7 +42,7 @@ test('citations keep Hindi UI labels when an approved post falls back to English
   const doc = new JSDOM(markup).window.document
   assert.equal(doc.querySelector('div')?.lang, 'en')
   assert.equal(doc.querySelector('a')?.lang, 'hi')
-  assert.equal(doc.querySelector('a')?.getAttribute('aria-label'), translator('hi')('summary.citeLabel', { n: 1, page: 1234 }))
+  assert.equal(doc.querySelector('a')?.getAttribute('aria-label'), `${translator('hi')('summary.citeLabel', { n: 1, page: 1234 })} (${translator('hi')('link.newTab')})`)
   assert.match(doc.querySelector('a')?.getAttribute('aria-label') ?? '', /1,234/)
 })
 
