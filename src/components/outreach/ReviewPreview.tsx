@@ -3,9 +3,9 @@
 import { useDocumentInfo, useFormModified } from '@payloadcms/ui'
 import { useEffect, useState } from 'react'
 import type { CitationSource } from '../../outreach/presentation'
-import { CitationText } from './CitationText'
+import { CitationText, withCitation } from './CitationText'
 
-const names: Record<string, string> = { schema: 'JSON schema', citations: 'Valid source citations', numbers: 'Numbers match cited sources', length: 'Platform length', language: 'Language', translation: 'Translation preserves the English pack' }
+const names: Record<string, string> = { schema: 'JSON schema', citations: 'Valid source citations', numbers: 'Numbers match cited sources', length: 'Length (title and body)', language: 'Language', translation: 'Translation preserves the English pack' }
 
 export function ReviewPreview() {
   const { id, data, lastUpdateTime } = useDocumentInfo()
@@ -37,7 +37,7 @@ export function ReviewPreview() {
     {error && <p role="alert">{error}</p>}
     <div className="science-review-draft"><h3>Saved draft preview</h3>
     {[data.title, data.dateline, ...(data.thread?.length ? data.thread.map((p: { text: string }) => p.text) : [data.body]), data.about].filter(Boolean).map((value, i) => <CitationText key={i} text={value} sources={sources} locale={language} />)}
-    {Array.isArray(data.quiz) && data.quiz.length > 0 && <><h3>Quiz</h3><ol>{data.quiz.map((q: any, i: number) => <li key={i}><CitationText text={`${q.question} [c:${q.chunk_id}]`} sources={sources} locale={language} /><ol>{q.options?.map((o: string, j: number) => <li key={j}>{o}{j === q.answer_index ? ' (correct answer)' : ''}</li>)}</ol><CitationText text={`${q.explanation ?? ''} [c:${q.chunk_id}]`} sources={sources} locale={language} /></li>)}</ol></>}
+    {Array.isArray(data.quiz) && data.quiz.length > 0 && <><h3>Quiz</h3><ol>{data.quiz.map((q: any, i: number) => <li key={i}><CitationText text={withCitation(q.question, q.chunk_id)} sources={sources} locale={language} /><ol>{q.options?.map((o: string, j: number) => <li key={j}>{o}{j === q.answer_index ? ' (correct answer)' : ''}</li>)}</ol><CitationText text={withCitation(q.explanation, q.chunk_id)} sources={sources} locale={language} /></li>)}</ol></>}
     </div><h3>Sources</h3>
     {loading ? <p role="status">Loading saved source citations…</p> : sources.length ? <ol className="science-sources">{sources.map((s) => <li key={s.id}><a href={s.recordUrl} lang={s.titleLocale} target="_blank" rel="noopener noreferrer">{s.title}</a>{s.pageUrl && <> · <a href={s.pageUrl} target="_blank" rel="noopener noreferrer">Page {s.page}</a></>} <small>[c:{s.id}]</small></li>)}</ol> : <p className="science-review-notice">No readable source citations are available.</p>}
   </section>

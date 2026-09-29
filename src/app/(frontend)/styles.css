@@ -164,7 +164,9 @@ header.bg-night, .dark header.bg-night { --line: #8FD3E8; }
     line-height: 1; text-decoration: none; vertical-align: 0.15em;
   }
   .citation-link:hover { background: var(--night); color: var(--snow); border-color: var(--night); }
-  sup:has(> .citation-link) { vertical-align: baseline; font-size: inherit; }
+  /* Preflight lifts every sup with position: relative; top: -0.5em, which the line box ignores, so the chip
+     overlapped the line above. Static keeps the chip inside its own line. */
+  sup:has(> .citation-link) { position: static; vertical-align: baseline; font-size: inherit; }
 
   .station-map { font: inherit; }
   .station-map-pin { border: 3px solid var(--snow); border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--night); }
