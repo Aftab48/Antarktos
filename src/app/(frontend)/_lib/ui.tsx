@@ -515,29 +515,29 @@ export function Meridian({ stations, l }: { stations: Doc[]; l: Locale }) {
     <figure className="min-w-0">
       <div className="grid h-[32rem] grid-cols-[4.5rem_1rem_2.5rem_minmax(0,1fr)] sm:grid-cols-[7.5rem_1rem_3rem_minmax(0,1fr)]">
         {/* Scale: decorative; the station list and caption carry the meaning. */}
-        <div aria-hidden="true" className="relative text-right text-sm leading-tight text-frost">
+        <div aria-hidden="true" className="relative text-right text-sm leading-tight text-slate">
           <span className="absolute right-3 top-0">90° {t('geo.n')}</span>
           {scale.map(([lat, key]) => (
             <span key={key} className="absolute right-3 -translate-y-1/2" style={at(latY(lat, H))}>{t(key)}</span>
           ))}
-          <span className="absolute right-4 -translate-y-1/2 font-medium text-snow" style={at((india[0] + india[1]) / 2)}>{t('geo.india')}</span>
+          <span className="absolute right-4 -translate-y-1/2 font-medium" style={at((india[0] + india[1]) / 2)}>{t('geo.india')}</span>
           <span className="absolute right-3 bottom-0">90° {t('geo.s')}</span>
         </div>
 
         <div aria-hidden="true" className="relative">
-          <span className="meridian-line absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-glacier" />
-          <span className="absolute w-2 bg-glacier/40" style={{ top: `${india[0]}rem`, height: `${india[1] - india[0]}rem`, left: 'calc(50% - 9px)' }} />
-          <span className="absolute top-0 left-0 h-0.5 w-full bg-glacier" />
-          <span className="absolute bottom-0 left-0 h-0.5 w-full bg-glacier" />
+          <span className="meridian-line absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-line" />
+          <span className="absolute w-2 bg-line/40" style={{ top: `${india[0]}rem`, height: `${india[1] - india[0]}rem`, left: 'calc(50% - 9px)' }} />
+          <span className="absolute top-0 left-0 h-0.5 w-full bg-line" />
+          <span className="absolute bottom-0 left-0 h-0.5 w-full bg-line" />
           {scale.map(([lat, key, dashed]) => (
-            <span key={key} className={`absolute left-0 w-full -translate-y-1/2 ${dashed ? 'border-t-2 border-dashed border-glacier' : 'h-0.5 bg-glacier'}`} style={at(latY(lat, H))} />
+            <span key={key} className={`absolute left-0 w-full -translate-y-1/2 ${dashed ? 'border-t-2 border-dashed border-line' : 'h-0.5 bg-line'}`} style={at(latY(lat, H))} />
           ))}
           {points.map((p, i) => {
             const historical = byId.get(p.id)?.operational_status === 'historical'
             return (
               <span
                 key={p.id}
-                className={`meridian-dot absolute left-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full ${historical ? 'border-2 border-signal bg-night' : 'bg-signal ring-2 ring-night'}`}
+                className={`meridian-dot absolute left-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full ${historical ? 'border-2 border-signal bg-ice' : 'bg-signal ring-2 ring-ice'}`}
                 style={{ ...at(ys[i]), '--y-frac': ys[i] / H } as CSSProperties}
               />
             )
@@ -546,7 +546,7 @@ export function Meridian({ stations, l }: { stations: Doc[]; l: Locale }) {
 
         <svg aria-hidden="true" viewBox="0 0 48 512" preserveAspectRatio="none" className="h-full w-full">
           {points.map((p, i) => (
-            <path key={p.id} d={`M0 ${ys[i] * 16}H12L36 ${labels[i] * 16}H48`} fill="none" stroke="#8FD3E8" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <path key={p.id} d={`M0 ${ys[i] * 16}H12L36 ${labels[i] * 16}H48`} fill="none" stroke="var(--line)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
           ))}
         </svg>
 
@@ -556,12 +556,12 @@ export function Meridian({ stations, l }: { stations: Doc[]; l: Locale }) {
             return (
               <li key={p.id} className="absolute inset-x-0 min-h-11 -translate-y-1/2 pl-2" style={at(labels[i])}>
                 <p className="flex flex-wrap items-baseline gap-x-2 leading-snug">
-                  <a href={p.url} lang={p.lang === l ? undefined : p.lang} className="font-semibold text-snow underline decoration-glacier/60 after:absolute after:inset-0 hover:decoration-glacier sm:text-lg">
+                  <a href={p.url} lang={p.lang === l ? undefined : p.lang} className="font-semibold underline decoration-line after:absolute after:inset-0 sm:text-lg">
                     {p.name}
                   </a>
-                  <span className="font-figures text-sm text-frost">{latitude(l, p.lat)}</span>
+                  <span className="font-figures text-sm text-slate">{latitude(l, p.lat)}</span>
                 </p>
-                <p className="flex flex-wrap gap-x-3 text-sm leading-snug text-frost">
+                <p className="flex flex-wrap gap-x-3 text-sm leading-snug text-slate">
                   <span className="hidden sm:inline">{label(l, 'region', s.region)}</span>
                   {s.established && <span>{t('station.establishedYear', { year: formatYear(l, s.established) })}</span>}
                   {s.operational_status === 'historical' && <span>{t('status.historical')}</span>}
@@ -571,7 +571,7 @@ export function Meridian({ stations, l }: { stations: Doc[]; l: Locale }) {
           })}
         </ol>
       </div>
-      <figcaption className="mt-6 text-sm text-frost">
+      <figcaption className="mt-6 text-sm text-slate">
         {t('home.meridian', { north: latitude(l, points[0].lat), south: latitude(l, points.at(-1)!.lat) })}
       </figcaption>
     </figure>

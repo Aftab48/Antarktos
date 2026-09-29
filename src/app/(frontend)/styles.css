@@ -55,23 +55,26 @@
     --color-control: var(--control);
     --color-rule: var(--rule);
     --color-alert: var(--alert);
+    --color-line: var(--line);
 }
 
 
 /* Public site only: this file is imported by app/(frontend)/[lang]/layout.tsx, never by the Payload admin.
    Palette and type: docs/redesign-spec.md §3-§5. Signal orange is a graphic/focus colour only, never text.
-   The header, footer and home hero are night-blue in both themes, so they re-declare the light palette. */
-:root, .dark :is(header.bg-night, footer.bg-night, .bleed-night) {
+   The header and footer are night-blue in both themes, so they re-declare the light palette.
+   `line` is the accent for rules and diagram strokes (the home meridian): glacier only reads on dark. */
+:root, .dark :is(header.bg-night, footer.bg-night) {
     color-scheme: light;
     --night: #0F2B36; --snow: #FFFFFF; --ice: #E7EEF0; --slate: #4B616A;
     --signal: #E4500E; --glacier: #8FD3E8; --frost: #A9C1C9; --deep: #173C4A;
-    --control: #6B838C; --rule: #B9C9CE; --alert: #A8200D;
+    --control: #6B838C; --rule: #B9C9CE; --alert: #A8200D; --line: #6B838C;
 }
-/* Dark theme (header toggle): snow becomes the page, night the ink. AA contrast: _lib/theme.test.ts. */
+/* Dark theme (header toggle): snow becomes the page, night the ink, deep the hover of ink-coloured buttons.
+   AA contrast: _lib/theme.test.ts. */
 .dark {
     color-scheme: dark;
     --snow: #07141A; --night: #E7EEF0; --ice: #133039; --slate: #A9C1C9;
-    --control: #7E97A0; --rule: #2C4853; --alert: #FF8C73;
+    --control: #7E97A0; --rule: #2C4853; --alert: #FF8C73; --deep: #C9D7DC; --line: #8FD3E8;
 }
 
 :root {
@@ -145,7 +148,6 @@
   /* Full-bleed bands inside the constrained <main>; clip-path keeps them from adding scroll width. */
   .bleed { background: var(--bleed); box-shadow: 0 0 0 100vmax var(--bleed); clip-path: inset(0 -100vmax); }
   .bleed-ice { --bleed: var(--ice); }
-  .bleed-night { --bleed: var(--night); color: var(--snow); }
 
   .portal-empty { padding: 1.5rem; border: 1.5px dashed var(--control); border-radius: 0.75rem; color: var(--night); max-width: 40rem; }
   .portal-loading-bar { height: 1rem; max-width: 30rem; border-radius: var(--radius); background: var(--ice); }

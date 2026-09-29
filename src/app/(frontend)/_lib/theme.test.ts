@@ -20,14 +20,16 @@ const ratio = (a: string, b: string) => {
   return (hi + 0.05) / (lo + 0.05)
 }
 
-const light = block(':root, .dark :is(')
+const light = block(':root, .dark :is(header')
 const themes = { light, dark: { ...light, ...block('\n.dark {') } }
 
 for (const [name, p] of Object.entries(themes)) {
   test(`${name} palette meets AA on page and panel backgrounds`, () => {
     for (const bg of ['snow', 'ice']) {
       for (const fg of ['night', 'slate', 'alert']) assert.ok(ratio(p[fg], p[bg]) >= 4.5, `${name}: ${fg} on ${bg} is ${ratio(p[fg], p[bg]).toFixed(2)}`)
-      for (const ui of ['control', 'signal']) assert.ok(ratio(p[ui], p[bg]) >= 3, `${name}: ${ui} on ${bg} is ${ratio(p[ui], p[bg]).toFixed(2)}`)
+      for (const ui of ['control', 'signal', 'line']) assert.ok(ratio(p[ui], p[bg]) >= 3, `${name}: ${ui} on ${bg} is ${ratio(p[ui], p[bg]).toFixed(2)}`)
     }
+    // Primary buttons: snow text on night, and on deep when hovered.
+    for (const bg of ['night', 'deep']) assert.ok(ratio(p.snow, p[bg]) >= 4.5, `${name}: snow on ${bg} is ${ratio(p.snow, p[bg]).toFixed(2)}`)
   })
 }

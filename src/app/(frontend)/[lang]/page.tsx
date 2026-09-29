@@ -42,22 +42,22 @@ export default async function Home({ params }: { params: Params }) {
 
   return (
     <>
-      <section aria-labelledby="home-title" className="bleed bleed-night py-12 sm:py-16 lg:py-20">
+      <section aria-labelledby="home-title" className="bleed bleed-ice py-12 sm:py-16 lg:py-20">
         <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:gap-16">
           <div className="lg:pt-6">
-            <h1 id="home-title" className={`font-display text-balance text-snow ${hi ? 'max-w-[14ch] text-4xl sm:text-6xl' : 'max-w-[12ch] text-5xl sm:text-7xl'}`}>
+            <h1 id="home-title" className={`font-display text-balance ${hi ? 'max-w-[14ch] text-4xl sm:text-6xl' : 'max-w-[12ch] text-5xl sm:text-7xl'}`}>
               {t('home.title')}
             </h1>
-            <p className="mt-6 max-w-[34rem] text-lg text-frost">{t('home.intro')}</p>
+            <p className="mt-6 max-w-[34rem] text-lg text-slate">{t('home.intro')}</p>
             <form method="get" action={href(l, '/archive')} role="search" className="mt-10 max-w-[34rem]">
-              <label htmlFor="home-q" className="text-sm font-medium text-snow">{t('archive.search')}</label>
+              <label htmlFor="home-q" className="text-sm font-medium">{t('archive.search')}</label>
               <div className="mt-2 flex">
-                <input id="home-q" name="q" type="search" maxLength={300} aria-describedby="home-q-hint" className="h-14 min-w-0 flex-1 rounded-l-md border-0 bg-snow px-4 text-lg text-night" />
-                <button type="submit" className="inline-flex h-14 shrink-0 items-center rounded-r-md bg-glacier px-5 font-semibold text-night hover:bg-snow">{t('archive.searchSubmit')}</button>
+                <input id="home-q" name="q" type="search" maxLength={300} aria-describedby="home-q-hint" className="h-14 min-w-0 flex-1 rounded-l-md border border-r-0 border-control bg-snow px-4 text-lg" />
+                <button type="submit" className="inline-flex h-14 shrink-0 items-center rounded-r-md bg-night px-5 font-semibold text-snow hover:bg-deep">{t('archive.searchSubmit')}</button>
               </div>
-              <p id="home-q-hint" className="mt-2 text-sm text-frost">{t('archive.searchHint')}</p>
+              <p id="home-q-hint" className="mt-2 text-sm text-slate">{t('archive.searchHint')}</p>
             </form>
-            <a href={href(l, '/ask')} className="mt-6 inline-flex min-h-11 items-center font-medium text-snow underline decoration-glacier hover:text-glacier">
+            <a href={href(l, '/ask')} className="mt-6 inline-flex min-h-11 items-center font-medium underline decoration-line">
               {t('ask.submit')}
             </a>
           </div>
