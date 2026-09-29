@@ -1,13 +1,15 @@
 'use client'
 
-import { useDocumentInfo, useFormModified } from '@payloadcms/ui'
+import { Drawer, DrawerToggler, useDocumentInfo, useFormModified, useModal } from '@payloadcms/ui'
 import { useRef, useState } from 'react'
 import { PLATFORMS } from '../../outreach/presentation'
 
+const SLUG = 'generate-outreach'
 const names = { blog: 'Blog', x: 'X', instagram: 'Instagram', linkedin: 'LinkedIn', press_note: 'Press note', student_explainer: 'Student explainer + quiz' }
 
 export function GenerateOutreach() {
   const { id, collectionSlug } = useDocumentInfo()
+  const { closeModal } = useModal()
   const modified = useFormModified()
   const [platforms, setPlatforms] = useState<string[]>([...PLATFORMS])
   const [languages, setLanguages] = useState<string[]>(['en', 'hi'])
@@ -46,9 +48,11 @@ export function GenerateOutreach() {
     } catch { setMessage('The response was interrupted. Retry uses the same request ID to avoid another model call.') }
     finally { setBusy(false) }
   }
-  return <details className="science-generate">
-    <summary>Generate outreach</summary>
-    <div className="science-panel" aria-busy={busy}>
+  // Payload's drawer: close button, click outside and Escape all close it. A running request keeps going.
+  return <>
+    <DrawerToggler slug={SLUG} className="science-generate-toggle">Generate outreach</DrawerToggler>
+    <Drawer slug={SLUG} title="Generate outreach">
+    <div className="science-generate" aria-busy={busy}>
       <p>Generate a cited draft pack from this saved record. Hindi translates the English pack.</p>
       {(!id || modified) && <p role="status">Save your record and any changes before generating outreach.</p>}
       <fieldset disabled={locked || !!request.current} style={{ border: 0, padding: 0 }}>
@@ -59,9 +63,13 @@ export function GenerateOutreach() {
         <legend>Languages</legend>
         {(['en', 'hi'] as const).map((l) => <label key={l} style={{ marginRight: '1rem' }}><input type="checkbox" checked={languages.includes(l)} onChange={() => toggle(l, languages, setLanguages)} /> {l === 'en' ? 'English' : 'हिन्दी'}</label>)}
       </fieldset>
-      <button className="science-action" type="button" disabled={locked || !platforms.length || !languages.length || posts.length > 0} onClick={generate}>{busy ? 'Generating…' : request.current ? 'Retry same request' : 'Generate draft pack'}</button>
+      <div className="science-generate__actions">
+        <button className="science-action" type="button" disabled={locked || !platforms.length || !languages.length || posts.length > 0} onClick={generate}>{busy ? 'Generating…' : request.current ? 'Retry same request' : 'Generate draft pack'}</button>
+        <button className="science-action science-action--secondary" type="button" onClick={() => closeModal(SLUG)}>{posts.length ? 'Close' : 'Cancel'}</button>
+      </div>
       <p role="status" aria-live="polite">{message}</p>
       {posts.length > 0 && <ul>{posts.map((p) => <li key={p.id}><a href={`/admin/collections/outreach-posts/${p.id}`}>{p.platform} · {p.language} · Draft {p.id}</a></li>)}</ul>}
     </div>
-  </details>
+    </Drawer>
+  </>
 }
