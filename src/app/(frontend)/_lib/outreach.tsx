@@ -45,7 +45,11 @@ export async function PostBody({ post, l, children }: { post: Doc; l: Locale; ch
   return <>
     <Meta className="mb-4" items={[<span key="p" className="font-medium text-night">{platformLabel(l, post.platform)}</span>, <time key="d" dateTime={post.createdAt}>{formatDate(l, post.createdAt)}</time>]} />
     <h1 lang={contentLocale} className={h1}>{postTitle(post, l)}</h1>
-    <p className="mt-4 mb-8 flex items-start gap-2 text-sm text-slate"><Reviewed />{t('outreach.reviewed')}</p>
+    <div className="mt-4 mb-8 flex items-start gap-2 text-sm text-slate"><Reviewed /><div>
+      <p>{t('outreach.reviewed')}</p>
+      {/* Provenance (plan §14): when it was approved and what drafted it. The reviewer's name stays staff-only. */}
+      <Meta className="mt-1" items={[post.reviewed_at && <time dateTime={post.reviewed_at}>{t('outreach.approvedOn', { date: formatDate(l, post.reviewed_at) })}</time>, post.model && <>{t('outreach.model')} {en(l, post.model)}{post.prompt_version && <> ({en(l, post.prompt_version)})</>}</>]} />
+    </div></div>
     {contentLocale !== l && <p className="mb-8 max-w-[40rem] rounded-xl border border-dashed border-control px-4 py-3 text-sm">{t('lang.fallback')}</p>}
     {media && <figure className="mb-8"><MediaImage m={media} l={l} sizes="(min-width: 1024px) 48rem, 95vw" eager className="max-h-[32rem] w-full rounded-xl bg-ice object-contain" />{media.credit && <figcaption className="mt-2"><Meta items={[<>{t('field.credit')}: {en(l, media.credit)}</>, media.license && en(l, media.license)]} /></figcaption>}</figure>}
     <div className="text-lg">{[post.dateline, ...(post.thread?.length ? post.thread.map((p: Doc) => p.text) : [post.body]), post.about].filter(Boolean).map((value, index) => <div key={index} className="mb-5"><CitationText text={value} sources={sources} locale={contentLocale} uiLocale={l} publicStyle /></div>)}</div>

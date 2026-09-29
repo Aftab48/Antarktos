@@ -168,6 +168,8 @@
   "news.back": "Back to news",
   "outreach.read": "Read the post and its sources",
   "outreach.reviewed": "Drafted from archive sources with AI and reviewed by staff before publication.",
+  "outreach.approvedOn": "Approved by a reviewer on {date}",
+  "outreach.model": "Drafted with",
   "outreach.sourcesUnavailable": "These source records are not currently available to the public.",
   "outreach.citation": "Go to source {n}",
   "outreach.share": "Copy and share",
