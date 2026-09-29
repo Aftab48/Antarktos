@@ -532,16 +532,13 @@ export function Meridian({ stations, l }: { stations: Doc[]; l: Locale }) {
           {scale.map(([lat, key, dashed]) => (
             <span key={key} className={`absolute left-0 w-full -translate-y-1/2 ${dashed ? 'border-t-2 border-dashed border-line' : 'h-0.5 bg-line'}`} style={at(latY(lat, H))} />
           ))}
-          {points.map((p, i) => {
-            const historical = byId.get(p.id)?.operational_status === 'historical'
-            return (
-              <span
-                key={p.id}
-                className={`meridian-dot absolute left-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full ${historical ? 'border-2 border-signal bg-ice' : 'bg-signal ring-2 ring-ice'}`}
-                style={{ ...at(ys[i]), '--y-frac': ys[i] / H } as CSSProperties}
-              />
-            )
-          })}
+          {points.map((p, i) => (
+            <span
+              key={p.id}
+              className={`meridian-dot absolute left-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full ${p.historical ? 'border-2 border-signal bg-ice' : 'bg-signal ring-2 ring-ice'}`}
+              style={{ ...at(ys[i]), '--y-frac': ys[i] / H } as CSSProperties}
+            />
+          ))}
         </div>
 
         <svg aria-hidden="true" viewBox="0 0 48 512" preserveAspectRatio="none" className="h-full w-full">

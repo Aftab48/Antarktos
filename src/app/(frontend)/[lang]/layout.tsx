@@ -42,12 +42,14 @@ export default async function Layout({ children, params }: { children: ReactNode
   const bare = path.replace(/^\/hi(?=\/|\?|$)/, '').split('?')[0] || '/'
   const section = '/' + (bare.split('/')[1] ?? '')
   const current = (p: string) => (section === p ? (bare === p ? 'page' : 'true') : undefined)
+  // "हिन्दी": Noto Sans Devanagari's metrics centre the headline-to-baseline body, so the i-matras above the headline
+  // make the label look about 2px high. 0.25em of top padding centres its ink (measured in Chromium); "English" is untouched.
   const toggle = (
     <a
       href={otherLocaleHref(l, path)}
       hrefLang={other}
       lang={other}
-      className="inline-flex min-h-11 shrink-0 items-center rounded-md border border-frost/60 px-4 font-medium text-snow hover:bg-deep"
+      className="inline-flex min-h-11 shrink-0 items-center rounded-md border border-frost/60 px-4 font-medium text-snow hover:bg-deep [&:lang(hi)]:pt-[0.25em]"
     >
       {t('lang.switch')}
     </a>

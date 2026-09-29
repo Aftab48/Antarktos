@@ -66,7 +66,9 @@ export default async function ApiDocs({ params }: { params: Params }) {
             {EXAMPLES.map(([label, path]) => (
               <li key={path}>
                 <p className="mb-2 font-medium">{t(label)}</p>
-                <pre lang="en" className="overflow-x-auto rounded-lg bg-night p-4 text-sm text-snow"><code>curl -g &quot;{base}{path}&quot;</code></pre>
+                {/* font-mono on <code> itself: the base `:lang(en)` rule would give it Archivo, whose & reads as a glyph.
+                    Long URLs wrap inside the box (copying keeps one line), so no sideways scroll at 375px. */}
+                <pre lang="en" className="rounded-lg bg-night p-4 text-sm whitespace-pre-wrap break-words text-snow"><code className="font-mono">curl -g &quot;{base}{path}&quot;</code></pre>
               </li>
             ))}
           </ul>

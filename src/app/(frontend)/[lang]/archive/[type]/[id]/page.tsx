@@ -35,6 +35,7 @@ import {
   whenOf,
 } from '../../../../_lib/ui'
 import { DatasetPreview } from './DatasetPreview'
+import { fileSize } from './file-size'
 
 type P = Params<{ type: string; id: string }>
 
@@ -52,8 +53,6 @@ export async function generateMetadata({ params }: { params: P }): Promise<Metad
 }
 
 const list = (v: unknown) => (Array.isArray(v) && v.length ? v.join(', ') : undefined)
-const megabytes = (l: Locale, bytes?: number) =>
-  bytes ? formatNumber(l, bytes / 1e6, { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }) : undefined
 const doiUrl = (doi?: string) => (doi ? (safeUrl(doi) ?? `https://doi.org/${doi.replace(/^doi:\s*/i, '')}`) : undefined)
 
 // The first action is the primary button, the rest secondary (spec §9.11). Files and other sites: new tab.
@@ -143,7 +142,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.type'), label(l, 'reportType', doc.report_type)],
           [t('field.year'), doc.year && formatYear(l, doc.year)],
           [t('field.pages'), doc.page_count && formatNumber(l, doc.page_count)],
-          [t('field.file'), megabytes(l, doc.filesize)],
+          [t('field.file'), fileSize(l, doc.filesize)],
           [t('field.keywords'), en(l, list(doc.keywords))],
         ],
         actions: [<ActionLink key="pdf" l={l} primary url={doc.url}>{t('action.openPdf')}</ActionLink>],
@@ -174,7 +173,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
           [t('field.doi'), doc.doi && <ExternalLink url={doiUrl(doc.doi)} l={l}>{doc.doi}</ExternalLink>],
           [t('field.contact'), en(l, doc.contact)],
           [t('field.keywords'), en(l, list(doc.keywords))],
-          [t('field.file'), megabytes(l, doc.filesize)],
+          [t('field.file'), fileSize(l, doc.filesize)],
         ],
         actions: [
           doc.filename && <ActionLink key="file" l={l} primary url={doc.url}>{t('action.download')}</ActionLink>,
