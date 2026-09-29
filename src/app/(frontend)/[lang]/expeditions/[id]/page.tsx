@@ -38,7 +38,7 @@ export default async function Expedition({ params }: { params: P }) {
       />
       {fallsBack(l, doc.title, doc.summary, doc.highlights) && <FallbackNote l={l} />}
 
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr]">
         <div className="flex min-w-0 max-w-[65ch] flex-col gap-6">
           {cover && <MediaImage m={cover} l={l} sizes="(min-width: 1024px) 40rem, 100vw" eager className="h-auto w-full rounded-xl" />}
           <Paragraphs v={doc.summary} l={l} className="flex flex-col gap-3 text-lg" />
@@ -53,7 +53,7 @@ export default async function Expedition({ params }: { params: P }) {
             </section>
           )}
         </div>
-        <aside className="self-start rounded-xl bg-ice p-6 lg:sticky lg:top-6">
+        <aside className="self-start rounded-xl bg-ice p-6 lg:sticky lg:top-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <Facts
             items={[
               [t('field.season'), season(doc, l)],
@@ -78,13 +78,13 @@ export default async function Expedition({ params }: { params: P }) {
           />
           <a href={href(l, `/compare?type=expeditions&a=${doc.id}`)} className="mt-6 inline-flex min-h-11 items-center font-medium underline">{t('compare.expedition')}</a>
         </aside>
-      </div>
 
-      <section aria-labelledby="records" className="mt-20">
-        <h2 id="records" className={h2}>{t('expedition.records')}</h2>
-        <LinkedRecords groups={groups} l={l} archiveQuery={`expedition=${doc.id}`} empty={t('expedition.none')} />
-        {/* Step 8: approved outreach posts about this expedition go here. */}
-      </section>
+        {/* Left column beside the facts on wide screens (a short summary no longer leaves it empty); after them on phones. */}
+        <section aria-labelledby="records" className="min-w-0 lg:col-start-1">
+          <h2 id="records" className={h2}>{t('expedition.records')}</h2>
+          <LinkedRecords groups={groups} l={l} archiveQuery={`expedition=${doc.id}`} empty={t('expedition.none')} />
+        </section>
+      </div>
     </article>
   )
 }

@@ -101,7 +101,8 @@ export function Facts({ items }: { items: [string, ReactNode][] }) {
   const shown = items.filter(([, v]) => v != null && v !== '' && v !== false)
   if (!shown.length) return null
   return (
-    <dl className="grid gap-4">
+    // One column that may shrink: otherwise a long unbreakable value (a URL) widens it past the box.
+    <dl className="grid grid-cols-[minmax(0,1fr)] gap-4">
       {shown.map(([k, v]) => (
         <div key={k}>
           <dt className="text-sm text-slate">{k}</dt>
@@ -126,7 +127,8 @@ export function ExternalLink({ url, children }: { url: unknown; children?: React
 export function provenanceFacts(l: Locale, doc: Doc): [string, ReactNode][] {
   const t = translator(l)
   return [
-    [t('field.source'), safeUrl(doc.source_url) && <ExternalLink url={doc.source_url} />],
+    // The site name, not the whole URL: the link itself still goes to the page.
+    [t('field.source'), safeUrl(doc.source_url) && <ExternalLink url={doc.source_url}>{en(l, new URL(doc.source_url).hostname.replace(/^www\./, ''))}</ExternalLink>],
     [t('field.license'), en(l, doc.license)],
     [t('field.credit'), en(l, doc.credit)],
   ]

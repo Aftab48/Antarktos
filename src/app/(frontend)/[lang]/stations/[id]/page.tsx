@@ -45,12 +45,12 @@ export default async function Station({ params }: { params: P }) {
       />
       {fallsBack(l, doc.name, doc.description) && <FallbackNote l={l} />}
 
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr]">
         <div className="flex min-w-0 max-w-[65ch] flex-col gap-6">
           {cover && <MediaImage m={cover} l={l} sizes="(min-width: 1024px) 40rem, 100vw" eager className="h-auto w-full rounded-xl" />}
           <Paragraphs v={doc.description} l={l} className="flex flex-col gap-3 text-lg" />
         </div>
-        <aside className="self-start rounded-xl bg-ice p-6 lg:sticky lg:top-6">
+        <aside className="self-start rounded-xl bg-ice p-6 lg:sticky lg:top-6 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <Facts
             items={[
               [t('field.region'), label(l, 'region', doc.region)],
@@ -63,19 +63,22 @@ export default async function Station({ params }: { params: P }) {
           />
           <a href={href(l, `/compare?type=stations&a=${doc.id}`)} className="mt-6 inline-flex min-h-11 items-center font-medium underline">{t('compare.station')}</a>
         </aside>
+
+        {/* Left column beside the facts on wide screens; after them on phones. */}
+        <div className="flex min-w-0 flex-col gap-16 lg:col-start-1">
+          {expeditions.docs.length > 0 && (
+            <section aria-labelledby="expeditions">
+              <h2 id="expeditions" className={h2}>{t('station.expeditions')}</h2>
+              <ExpeditionList docs={expeditions.docs} l={l} />
+            </section>
+          )}
+
+          <section aria-labelledby="records">
+            <h2 id="records" className={h2}>{t('station.records')}</h2>
+            <LinkedRecords groups={groups} l={l} archiveQuery={`station=${doc.id}`} empty={t('station.none')} />
+          </section>
+        </div>
       </div>
-
-      {expeditions.docs.length > 0 && (
-        <section aria-labelledby="expeditions" className="mt-20">
-          <h2 id="expeditions" className={h2}>{t('station.expeditions')}</h2>
-          <ExpeditionList docs={expeditions.docs} l={l} />
-        </section>
-      )}
-
-      <section aria-labelledby="records" className="mt-20">
-        <h2 id="records" className={h2}>{t('station.records')}</h2>
-        <LinkedRecords groups={groups} l={l} archiveQuery={`station=${doc.id}`} empty={t('station.none')} />
-      </section>
     </article>
   )
 }
