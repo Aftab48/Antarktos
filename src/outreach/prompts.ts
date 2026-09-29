@@ -3,10 +3,12 @@ import path from 'node:path'
 import { generationSchema } from './schema'
 import { PLATFORMS, type EvidenceChunk, type GenerationItem, type Platform, type PromptMedia } from './types'
 
-export const PROMPT_VERSION = 'outreach-v1.1'
-const citationClarification = readFileSync(path.join(process.cwd(), 'src/outreach/citation-v1.1.md'), 'utf8')
-const generationPrompt = `${readFileSync(path.join(process.cwd(), 'src/outreach/generate-v1.md'), 'utf8')}\n\n${citationClarification}`
-const translationPrompt = `${readFileSync(path.join(process.cwd(), 'src/outreach/translate-v1.md'), 'utf8')}\n\n${citationClarification}`
+export const PROMPT_VERSION = 'outreach-v1.2'
+// Base prompts stay as released; each version appends its tracked clarifications (see CHANGELOG.md).
+// Literal paths so Next's file tracing bundles the prompt files.
+const addenda = `${readFileSync(path.join(process.cwd(), 'src/outreach/citation-v1.1.md'), 'utf8')}\n\n${readFileSync(path.join(process.cwd(), 'src/outreach/headline-v1.2.md'), 'utf8')}`
+const generationPrompt = `${readFileSync(path.join(process.cwd(), 'src/outreach/generate-v1.md'), 'utf8')}\n\n${addenda}`
+const translationPrompt = `${readFileSync(path.join(process.cwd(), 'src/outreach/translate-v1.md'), 'utf8')}\n\n${addenda}`
 export type PromptMessage = { role: 'system' | 'user'; content: string }
 
 function evidence(chunks: EvidenceChunk[], media: PromptMedia[]) {

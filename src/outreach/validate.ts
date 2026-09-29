@@ -54,6 +54,16 @@ export function platformLength(item: GenerationItem): boolean {
   }
 }
 
+// Every item needs a headline (outreach-v1.2): it is the public H1, news card, admin title and Instagram card text.
+// The prompt targets 40–70 characters; the check counts what a reader sees (grapheme clusters, markers excluded)
+// and allows 20–90. Code points would flag faithful Hindi: a 68-character English headline translates to ~97
+// Devanagari code points but ~72 graphemes, and a 46-character one to ~28 graphemes.
+const graphemes = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+export const headlineLength = (title: string) => {
+  const n = [...graphemes.segment(withoutMarkers(title).trim().normalize('NFC'))].length
+  return n >= 20 && n <= 90
+}
+
 function languagePass(item: GenerationItem): boolean {
   const text = [item.title, item.body, item.dateline, item.about, ...item.thread, ...item.quiz.flatMap(q => [q.question, ...q.options, q.explanation])].join(' ')
   const letters = withoutMarkers(text).match(/\p{L}/gu) ?? []
@@ -150,12 +160,13 @@ export function validateGenerationPack(raw: unknown, context: ValidationContext)
     if (referenced.some(id => !item.cited_chunk_ids.includes(id))) citationIssues.push('Inline/quiz citation missing from cited_chunk_ids.')
     item.cited_chunk_ids = unique([...item.cited_chunk_ids, ...referenced.filter(id => allowed.has(id))])
     const translation = context.language === 'hi' ? unique([...translationIssues(original, context.englishItems?.find(e => e.platform === platform)), ...translationIssues(item, context.englishItems?.find(e => e.platform === platform))]) : []
-    const length = platformLength(item)
+    const bodyLength = platformLength(item)
+    const headline = headlineLength(item.title)
     const language = languagePass(item)
     if (platform === 'press_note' && (!item.dateline || !item.about)) citationIssues.push('Press note needs source-backed dateline and approved About NCPOR text.')
     if (platform === 'student_explainer' && item.quiz.length !== 5) citationIssues.push('Grounded quiz requires five questions.')
-    return { item, checks: { schema: true, citations: citationIssues.length === 0, numbers: numberIssues.length === 0, length, language, translation: translation.length === 0 },
-      issues: [...citationIssues, ...numberIssues, ...translation, ...(!length ? ['Platform length failed.'] : []), ...(!language ? ['Target-language script check failed.'] : [])] }
+    return { item, checks: { schema: true, citations: citationIssues.length === 0, numbers: numberIssues.length === 0, length: bodyLength && headline, language, translation: translation.length === 0 },
+      issues: [...citationIssues, ...numberIssues, ...translation, ...(!headline ? ['Title must be a 20–90 character headline.'] : []), ...(!bodyLength ? ['Platform length failed.'] : []), ...(!language ? ['Target-language script check failed.'] : [])] }
   })
   return { items, schemaErrors: unique(schemaErrors) }
 }

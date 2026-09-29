@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { generateOutreach, type GenerationDependencies, type GenerationResult } from './generate'
 import { parseGenerationRequest, requireSameOrigin } from './request'
 import { staffRole, guardOutreach } from './access'
+import { linkedPhotos } from './store'
 import type { GenerationItem } from './types'
 
 const input = parseGenerationRequest({ requestId: '0b7e7d16-b68a-4b25-960b-857c13bc26d1', collection: 'reports', id: 7, platforms: ['x'], languages: ['en', 'hi'] })
@@ -115,4 +116,28 @@ test('Actual relationship, quiz answer and thread-order edits still clear approv
     assert.equal(result.review_status, 'pending')
     assert.equal(result.checks.schema, false)
   }
+})
+test('Suggested photos come only from published images of the record, its stations or its expedition', () => {
+  const published = [{ _status: { equals: 'published' } }, { mimeType: { in: ['image/jpeg', 'image/png', 'image/webp'] } }]
+  const report = linkedPhotos('reports', 28, { stations: [4], expedition: { id: 40 } })
+  assert.deepEqual(report, { own: [], where: { and: [{ or: [{ stations: { in: [4] } }, { expedition: { in: [40] } }] }, ...published] } })
+  assert.deepEqual(linkedPhotos('events', 3, { media: [9, { id: 10 }], stations: [], expedition: null })?.where, { and: [{ or: [{ id: { in: [9, 10] } }] }, ...published] })
+  assert.deepEqual(linkedPhotos('stations', 2, { cover: 9 })?.where, { and: [{ or: [{ id: { in: [9] } }, { stations: { in: [2] } }] }, ...published] })
+  assert.deepEqual(linkedPhotos('expeditions', 40, { stations: [4], cover: null })?.where, { and: [{ or: [{ stations: { in: [4] } }, { expedition: { in: [40] } }] }, ...published] })
+  assert.deepEqual(linkedPhotos('media', 9, { stations: ['4', -1] })?.where, { and: [{ or: [{ id: { in: [9] } }] }, ...published] })
+  assert.equal(linkedPhotos('publications', 5, { stations: [], expedition: null }), null)
+})
+test('A supplied linked photo survives checks and translation; any other ID is dropped', async () => {
+  const { deps, saved } = fixture()
+  deps.evidence = async () => ({ chunks: [{ id: '1', text: 'The station measures ice.' }], media: [{ id: 9, caption: 'Maitri station', alt: 'Station buildings', credit: 'A. Photographer' }] })
+  const photo = { ...en, platform: 'instagram' as const, suggested_media: '9' }
+  deps.complete = async (language) => {
+    return { choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ items: [{ ...photo, language, body: language === 'hi' ? 'केंद्र बर्फ मापता है।' : en.body }] }) } }] }
+  }
+  await generateOutreach({ ...input, platforms: ['instagram'] }, deps)
+  assert.deepEqual(saved.map((s) => (s as { item: GenerationItem }).item.suggested_media), ['9', '9'])
+  deps.evidence = async () => ({ chunks: [{ id: '1', text: 'The station measures ice.' }], media: [] })
+  saved.length = 0
+  await generateOutreach({ ...input, platforms: ['instagram'] }, deps)
+  assert.deepEqual(saved.map((s) => (s as { item: GenerationItem }).item.suggested_media), [null, null])
 })
