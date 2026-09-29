@@ -1,9 +1,11 @@
-import type { Access, CollectionConfig } from 'payload'
+import type { Access, CollectionConfig, FieldAccess } from 'payload'
 
 import { canPublishField, contentAccess, onlyPublishersPublish } from '../access'
 import { guardOutreach, staffRole } from '../outreach/access'
 
 const reviewerOnly = { create: canPublishField, update: canPublishField }
+// Internal review data: the public API and public pages never see it (only reviewed_at is shown, plan §14).
+const staffRead = { read: (({ req }) => staffRole(req.user?.role)) as FieldAccess }
 
 // One generated item per platform and language (plan §10, §16). English and Hindi posts are
 // separate documents reviewed separately, so this collection uses `language`, not localization.
@@ -65,7 +67,7 @@ export const OutreachPosts: CollectionConfig = {
     { name: 'suggested_media', type: 'upload', relationTo: 'media' },
     { name: 'cited_chunk_ids', type: 'number', hasMany: true, admin: { readOnly: true } },
     // Pass/fail check list for the reviewer (plan §10.3). Never a numeric confidence.
-    { name: 'checks', type: 'json', admin: { readOnly: true, hidden: true } },
+    { name: 'checks', type: 'json', access: staffRead, admin: { readOnly: true, hidden: true } },
     { name: 'check_issues', type: 'text', hasMany: true, admin: { readOnly: true }, access: { read: ({ req }) => staffRole(req.user?.role) } },
     { name: 'generation_request_id', type: 'text', index: true, admin: { readOnly: true, position: 'sidebar' }, access: { read: ({ req }) => staffRole(req.user?.role) } },
     { name: 'model', type: 'text', admin: { readOnly: true, position: 'sidebar' } },
@@ -79,8 +81,8 @@ export const OutreachPosts: CollectionConfig = {
       access: reviewerOnly,
       admin: { position: 'sidebar' },
     },
-    { name: 'reviewed_by', type: 'relationship', relationTo: 'users', access: reviewerOnly, admin: { position: 'sidebar', readOnly: true } },
+    { name: 'reviewed_by', type: 'relationship', relationTo: 'users', access: { ...reviewerOnly, ...staffRead }, admin: { position: 'sidebar', readOnly: true } },
     { name: 'reviewed_at', type: 'date', access: reviewerOnly, admin: { position: 'sidebar', readOnly: true } },
-    { name: 'review_note', type: 'textarea', access: reviewerOnly, admin: { position: 'sidebar' } },
+    { name: 'review_note', type: 'textarea', access: { ...reviewerOnly, ...staffRead }, admin: { position: 'sidebar' } },
   ],
 }

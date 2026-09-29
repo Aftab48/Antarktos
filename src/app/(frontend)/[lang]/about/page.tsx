@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { translator, type Key } from '@/i18n'
+import { href, translator, type Key } from '@/i18n'
 
 import { pageLocale, type Params } from '../../_lib/data'
 import { h2Base, PageHead } from '../../_lib/ui'
@@ -17,7 +17,8 @@ const SECTIONS: [Key, Key][] = [
 ]
 
 export default async function About({ params }: { params: Params }) {
-  const t = translator(await pageLocale(params))
+  const l = await pageLocale(params)
+  const t = translator(l)
   return (
     <>
       <PageHead title={t('about.title')} />
@@ -28,6 +29,7 @@ export default async function About({ params }: { params: Params }) {
             <p className="text-lg leading-relaxed">{t(body)}</p>
           </section>
         ))}
+        <p className="mb-12 text-lg"><a href={href(l, '/about/api')} className="font-medium underline">{t('api.link')}</a></p>
         <p className="text-sm text-slate">{t('site.disclaimer')}</p>
       </div>
     </>
