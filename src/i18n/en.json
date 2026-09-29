@@ -251,5 +251,18 @@
   "api.pLimit": "Page size (default 10) and page number.",
   "api.pDepth": "0 returns linked records as ids; 1 or 2 fills them in.",
   "api.pSelect": "Return only the listed fields, e.g. select[title]=true.",
-  "api.license": "Reuse of each record follows its license and credit fields."
+  "api.license": "Reuse of each record follows its license and credit fields.",
+  "compare.title": "Compare",
+  "compare.intro": "Put two expeditions or two research stations side by side. Every value comes straight from the archive records.",
+  "compare.kind": "What to compare",
+  "compare.first": "First",
+  "compare.second": "Second",
+  "compare.choose": "Choose…",
+  "compare.submit": "Compare",
+  "compare.caption": "{a} compared with {b}",
+  "compare.records": "Records in the archive",
+  "compare.pick": "Choose two to see them side by side.",
+  "compare.expedition": "Compare with another expedition",
+  "compare.station": "Compare with another station",
+  "compare.learn": "Compare two expeditions or stations"
 }

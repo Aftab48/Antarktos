@@ -27,7 +27,7 @@ const NAV: [string, Key][] = [
   ['/news', 'nav.news'],
 ]
 const MENU: [string, Key][] = [...NAV, ['/about', 'nav.about']]
-const FOOTER: [string, Key][] = [['/about', 'nav.about'], ['/archive', 'nav.archive'], ['/ask', 'nav.ask'], ['/learn', 'nav.learn'], ['/news', 'nav.news']]
+const FOOTER: [string, Key][] = [['/about', 'nav.about'], ['/archive', 'nav.archive'], ['/ask', 'nav.ask'], ['/learn', 'nav.learn'], ['/compare', 'compare.title'], ['/news', 'nav.news']]
 
 export default async function Layout({ children, params }: { children: ReactNode; params: Params }) {
   const l = await pageLocale(params)

@@ -61,6 +61,7 @@ export default async function Station({ params }: { params: P }) {
               ...provenanceFacts(l, doc),
             ]}
           />
+          <a href={href(l, `/compare?type=stations&a=${doc.id}`)} className="mt-6 inline-flex min-h-11 items-center font-medium underline">{t('compare.station')}</a>
         </aside>
       </div>
 

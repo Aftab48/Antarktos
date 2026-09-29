@@ -76,6 +76,7 @@ export default async function Expedition({ params }: { params: P }) {
               ...provenanceFacts(l, doc),
             ]}
           />
+          <a href={href(l, `/compare?type=expeditions&a=${doc.id}`)} className="mt-6 inline-flex min-h-11 items-center font-medium underline">{t('compare.expedition')}</a>
         </aside>
       </div>
 
