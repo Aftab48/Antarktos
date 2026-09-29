@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* `dark:` follows the header toggle (class on <html>), not the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
@@ -56,12 +59,22 @@
 
 
 /* Public site only: this file is imported by app/(frontend)/[lang]/layout.tsx, never by the Payload admin.
-   Palette and type: docs/redesign-spec.md §3-§5. Signal orange is a graphic/focus colour only, never text. */
-:root {
+   Palette and type: docs/redesign-spec.md §3-§5. Signal orange is a graphic/focus colour only, never text.
+   The header, footer and home hero are night-blue in both themes, so they re-declare the light palette. */
+:root, .dark :is(header.bg-night, footer.bg-night, .bleed-night) {
+    color-scheme: light;
     --night: #0F2B36; --snow: #FFFFFF; --ice: #E7EEF0; --slate: #4B616A;
     --signal: #E4500E; --glacier: #8FD3E8; --frost: #A9C1C9; --deep: #173C4A;
     --control: #6B838C; --rule: #B9C9CE; --alert: #A8200D;
+}
+/* Dark theme (header toggle): snow becomes the page, night the ink. AA contrast: _lib/theme.test.ts. */
+.dark {
+    color-scheme: dark;
+    --snow: #07141A; --night: #E7EEF0; --ice: #133039; --slate: #A9C1C9;
+    --control: #7E97A0; --rule: #2C4853; --alert: #FF8C73;
+}
 
+:root {
     --font-sans: var(--font-archivo), "Noto Sans Devanagari", "Nirmala UI", system-ui, sans-serif;
     --background: var(--snow);   --foreground: var(--night);
     --card: var(--snow);         --card-foreground: var(--night);
@@ -152,6 +165,7 @@
   .station-map { font: inherit; }
   .station-map-pin { border: 3px solid var(--snow); border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 2px var(--night); }
   .station-map .leaflet-popup-content { font: inherit; line-height: 1.65; }
+  .station-map :is(.leaflet-popup-content-wrapper, .leaflet-popup-tip) { background: var(--snow); color: var(--night); }
   .station-map .leaflet-popup-content a { color: var(--night); }
   .station-map .leaflet-control-attribution { background: var(--snow); color: var(--night); }
   .station-map .leaflet-control-attribution a { color: var(--night); }

@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { href, otherLocaleHref, translator, type Key } from '@/i18n'
 
 import { pageLocale, type Params } from '../_lib/data'
+import { ThemeToggle } from '../_lib/ThemeToggle'
 import { BrandMark } from '../_lib/ui'
 import '../styles.css'
 
@@ -28,6 +29,8 @@ const NAV: [string, Key][] = [
 ]
 const MENU: [string, Key][] = [...NAV, ['/about', 'nav.about']]
 const FOOTER: [string, Key][] = [['/about', 'nav.about'], ['/archive', 'nav.archive'], ['/ask', 'nav.ask'], ['/learn', 'nav.learn'], ['/compare', 'compare.title'], ['/news', 'nav.news']]
+// Runs before first paint so a dark page never flashes light: the saved choice, else the OS setting.
+const THEME = `try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`
 
 export default async function Layout({ children, params }: { children: ReactNode; params: Params }) {
   const l = await pageLocale(params)
@@ -51,13 +54,17 @@ export default async function Layout({ children, params }: { children: ReactNode
   )
 
   return (
-    <html lang={l} dir="ltr" className={archivo.variable}>
+    // suppressHydrationWarning: the theme script adds `dark` to the class before React hydrates.
+    <html lang={l} dir="ltr" className={archivo.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME }} />
+      </head>
       <body className="flex min-h-dvh flex-col">
         <a href="#main" className="sr-only rounded-md focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-snow focus:px-4 focus:py-3 focus:text-night">
           {t('skip')}
         </a>
         <header className="relative bg-night text-snow">
-          <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
             <a href={href(l, '/')} className="mr-auto inline-flex min-h-11 items-center gap-3 text-snow no-underline">
               <BrandMark />
               <span className="font-display text-2xl">{t('site.name')}</span>
@@ -77,6 +84,7 @@ export default async function Layout({ children, params }: { children: ReactNode
                 ))}
               </ul>
             </nav>
+            <ThemeToggle label={t('theme.dark')} />
             {toggle}
             {/* Native disclosure: keyboard and screen-reader support without script. Tab order = visual order. */}
             <details className="group lg:hidden">
