@@ -14,12 +14,21 @@ export const Stations: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', localized: true, required: true },
     { ...region, required: true },
-    { name: 'lat', type: 'number', min: -90, max: 90 },
-    { name: 'lng', type: 'number', min: -180, max: 180 },
+    { name: 'lat', label: 'Latitude', type: 'number', min: -90, max: 90 },
+    { name: 'lng', label: 'Longitude', type: 'number', min: -180, max: 180 },
     { name: 'established', type: 'number', min: 1900, max: 2100 },
     { name: 'decommissioned', type: 'number', min: 1900, max: 2100 },
     // Not `status`: that name collides with the drafts `_status` enum in Postgres.
-    { name: 'operational_status', type: 'select', options: ['active', 'historical'], defaultValue: 'active' },
+    {
+      name: 'operational_status',
+      label: 'Operational status',
+      type: 'select',
+      options: [
+        { label: 'Active', value: 'active' },
+        { label: 'Historical', value: 'historical' },
+      ],
+      defaultValue: 'active',
+    },
     { name: 'description', type: 'textarea', localized: true },
     { name: 'cover', type: 'upload', relationTo: 'media' },
     ...provenance,

@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { contentAccess, onlyPublishersPublish } from '../access'
 import { guardPipelineFields, removeChunks, startProcessing } from '../pipeline'
 import { checkUpload } from '../storage'
-import { expedition, processing, provenance, region, stations, year } from './fields'
+import { dayOnly, expedition, processing, provenance, region, stations, year } from './fields'
 
 // DCAT-style metadata plus one optional file or an external link (plan §9). Metadata and download only.
 // ponytail: one file per dataset (zip several); add a dataset-files upload collection if records need many.
@@ -36,14 +36,15 @@ export const Datasets: CollectionConfig = {
     { name: 'abstract', type: 'textarea', localized: true },
     { name: 'keywords', type: 'text', hasMany: true },
     { name: 'parameters', type: 'text', hasMany: true, admin: { description: 'Parameters measured' } },
-    { name: 'temporal_from', type: 'date' },
-    { name: 'temporal_to', type: 'date' },
+    { name: 'temporal_from', label: 'Temporal coverage from', type: 'date', admin: dayOnly },
+    { name: 'temporal_to', label: 'Temporal coverage to', type: 'date', admin: dayOnly },
     region,
     year,
     expedition,
     stations,
     {
       name: 'bbox',
+      label: 'Bounding box',
       type: 'group',
       admin: { description: 'Spatial coverage in decimal degrees, if wider than the stations' },
       fields: [
@@ -54,8 +55,8 @@ export const Datasets: CollectionConfig = {
       ],
     },
     { name: 'format', type: 'text' },
-    { name: 'external_url', type: 'text', admin: { description: 'Data portal link, if the file is not uploaded here' } },
-    { name: 'doi', type: 'text' },
+    { name: 'external_url', label: 'External URL', type: 'text', admin: { description: 'Data portal link, if the file is not uploaded here' } },
+    { name: 'doi', label: 'DOI', type: 'text' },
     { name: 'contact', type: 'text' },
     ...provenance,
     ...processing,

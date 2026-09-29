@@ -16,8 +16,8 @@ export const Expeditions: CollectionConfig = {
     { name: 'number', type: 'text' },
     { ...region, required: true },
     // Season years (e.g. 1981 to 1982), as the public sources give them.
-    { name: 'season_start', type: 'number', min: 1900, max: 2100 },
-    { name: 'season_end', type: 'number', min: 1900, max: 2100 },
+    { name: 'season_start', label: 'Season start (year)', type: 'number', min: 1900, max: 2100 },
+    { name: 'season_end', label: 'Season end (year)', type: 'number', min: 1900, max: 2100 },
     { name: 'leader', type: 'text' },
     { name: 'stations', type: 'relationship', relationTo: 'stations', hasMany: true },
     { name: 'summary', type: 'textarea', localized: true },

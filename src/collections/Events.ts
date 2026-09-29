@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { contentAccess, onlyPublishersPublish } from '../access'
 import { guardPipelineFields, removeChunks, startProcessing } from '../pipeline'
-import { expedition, processing, provenance, region, stations } from './fields'
+import { dayOnly, expedition, processing, provenance, region, stations } from './fields'
 
 // Institutional activities (plan §9).
 export const Events: CollectionConfig = {
@@ -13,9 +13,10 @@ export const Events: CollectionConfig = {
   hooks: { beforeChange: [onlyPublishersPublish, guardPipelineFields], afterChange: [startProcessing], afterDelete: [removeChunks] },
   fields: [
     { name: 'title', type: 'text', localized: true, required: true },
-    { name: 'date', type: 'date' },
+    { name: 'date', type: 'date', admin: dayOnly },
     {
       name: 'event_type',
+      label: 'Event type',
       type: 'select',
       options: [
         { label: 'Workshop', value: 'workshop' },

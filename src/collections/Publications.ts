@@ -18,7 +18,7 @@ export const Publications: CollectionConfig = {
     { name: 'authors', type: 'text', hasMany: true },
     { name: 'venue', type: 'text' },
     year,
-    { name: 'doi', type: 'text' },
+    { name: 'doi', label: 'DOI', type: 'text' },
     { name: 'link', type: 'text', admin: { description: 'Link to the paper (publisher or repository page)' } },
     { name: 'abstract', type: 'textarea', localized: true },
     region,

@@ -1,12 +1,14 @@
 'use client'
 
-import { useField } from '@payloadcms/ui'
+import { useDocumentInfo, useField } from '@payloadcms/ui'
 import type { SelectFieldClientProps } from 'payload'
 import { ProcessingState } from './ProcessingState'
 
 export function ProcessingField({ path }: SelectFieldClientProps) {
   const { value } = useField<string>({ path })
-  return <ProcessingState value={value} />
+  const { id } = useDocumentInfo()
+  // An unsaved record only has the default "queued"; nothing is waiting until it is saved.
+  return <ProcessingState value={id ? value : null} />
 }
 
 export function ProcessingCell({ cellData }: { cellData?: unknown }) {

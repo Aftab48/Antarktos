@@ -5,8 +5,10 @@ import { isAdmin, isAdminField } from '../access'
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
-    useAsTitle: 'email',
-    defaultColumns: ['email', 'name', 'role'],
+    // The name reads better than an email wherever a user is shown, e.g. "Reviewed by" on outreach posts.
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'email', 'role'],
+    listSearchableFields: ['name', 'email'],
   },
   auth: true,
   access: {
