@@ -264,5 +264,9 @@
   "compare.pick": "Choose two to see them side by side.",
   "compare.expedition": "Compare with another expedition",
   "compare.station": "Compare with another station",
-  "compare.learn": "Compare two expeditions or stations"
+  "compare.learn": "Compare two expeditions or stations",
+  "dataset.preview": "Data preview",
+  "dataset.previewNote": "The first {rows} rows of the file ({cols} columns). Download the file for the full data.",
+  "dataset.chart": "{y} by {x}, from the rows shown below",
+  "dataset.chartLabel": "Line chart of {y} by {x} from {from} to {to}. Values range from {min} to {max}."
 }

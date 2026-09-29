@@ -32,6 +32,7 @@ import {
   TypeMark,
   whenOf,
 } from '../../../../_lib/ui'
+import { DatasetPreview } from './DatasetPreview'
 
 type P = Params<{ type: string; id: string }>
 
@@ -160,6 +161,7 @@ function details(type: RecordType, doc: Doc, l: Locale): { body: ReactNode; fact
                 </ul>
               </section>
             )}
+            <DatasetPreview doc={doc} l={l} />
           </>
         ),
         facts: [
