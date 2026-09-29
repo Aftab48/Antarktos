@@ -112,10 +112,10 @@ export default async function Layout({ children, params }: { children: ReactNode
         <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 pb-20 focus:outline-none sm:px-6 lg:px-8">
           {children}
         </main>
-        <footer className="bg-night text-frost">
+        <footer className="border-t border-rule bg-ice text-slate">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1fr_12rem_minmax(0,1.4fr)] lg:px-8">
             <div>
-              <a href={href(l, '/')} className="inline-flex min-h-11 items-center gap-3 text-snow no-underline">
+              <a href={href(l, '/')} className="inline-flex min-h-11 items-center gap-3 text-night no-underline">
                 <BrandMark />
                 <span className="font-display text-2xl">{t('site.name')}</span>
               </a>
@@ -125,13 +125,13 @@ export default async function Layout({ children, params }: { children: ReactNode
               <ul>
                 {FOOTER.map(([p, key]) => (
                   <li key={p}>
-                    <a href={href(l, p)} className="inline-flex min-h-11 items-center text-snow no-underline hover:text-glacier hover:underline">
+                    <a href={href(l, p)} className="inline-flex min-h-11 items-center text-night no-underline hover:underline">
                       {t(key)}
                     </a>
                   </li>
                 ))}
                 <li>
-                  <a href={otherLocaleHref(l, path)} hrefLang={other} lang={other} className="inline-flex min-h-11 items-center text-snow no-underline hover:text-glacier hover:underline">
+                  <a href={otherLocaleHref(l, path)} hrefLang={other} lang={other} className="inline-flex min-h-11 items-center text-night no-underline hover:underline">
                     {t('lang.switch')}
                   </a>
                 </li>

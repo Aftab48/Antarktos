@@ -147,8 +147,8 @@ export function provenanceFacts(l: Locale, doc: Doc): [string, ReactNode][] {
 export function BrandMark() {
   return (
     <svg aria-hidden="true" viewBox="0 0 28 28" className="size-7 shrink-0">
-      <circle cx="14" cy="14" r="12" fill="none" stroke="#8FD3E8" strokeWidth="2" />
-      <path d="M14 2v24" stroke="#8FD3E8" strokeWidth="2" />
+      <circle cx="14" cy="14" r="12" fill="none" stroke="var(--line)" strokeWidth="2" />
+      <path d="M14 2v24" stroke="var(--line)" strokeWidth="2" />
       <circle cx="14" cy="22" r="3.5" fill="#E4500E" />
     </svg>
   )

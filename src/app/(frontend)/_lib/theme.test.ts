@@ -20,7 +20,7 @@ const ratio = (a: string, b: string) => {
   return (hi + 0.05) / (lo + 0.05)
 }
 
-const light = block(':root, .dark :is(header')
+const light = block(':root, .dark header')
 const themes = { light, dark: { ...light, ...block('\n.dark {') } }
 
 for (const [name, p] of Object.entries(themes)) {

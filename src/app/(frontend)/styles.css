@@ -61,9 +61,9 @@
 
 /* Public site only: this file is imported by app/(frontend)/[lang]/layout.tsx, never by the Payload admin.
    Palette and type: docs/redesign-spec.md §3-§5. Signal orange is a graphic/focus colour only, never text.
-   The header and footer are night-blue in both themes, so they re-declare the light palette.
+   The header is night-blue in both themes, so it re-declares the light palette.
    `line` is the accent for rules and diagram strokes (the home meridian): glacier only reads on dark. */
-:root, .dark :is(header.bg-night, footer.bg-night) {
+:root, .dark header.bg-night {
     color-scheme: light;
     --night: #0F2B36; --snow: #FFFFFF; --ice: #E7EEF0; --slate: #4B616A;
     --signal: #E4500E; --glacier: #8FD3E8; --frost: #A9C1C9; --deep: #173C4A;
@@ -76,6 +76,8 @@
     --snow: #07141A; --night: #E7EEF0; --ice: #133039; --slate: #A9C1C9;
     --control: #7E97A0; --rule: #2C4853; --alert: #FF8C73; --deep: #C9D7DC; --line: #8FD3E8;
 }
+/* On the night-blue header the accent (brand mark) is glacier in both themes. */
+header.bg-night, .dark header.bg-night { --line: #8FD3E8; }
 
 :root {
     --font-sans: var(--font-archivo), "Noto Sans Devanagari", "Nirmala UI", system-ui, sans-serif;
