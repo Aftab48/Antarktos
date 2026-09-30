@@ -76,9 +76,28 @@ const latitude = (l: Locale, lat: number) =>
 
 // Resized copies from upload time (plan §6.3); the original only if no copy exists.
 export function MediaImage({ m, l, sizes, className, eager }: { m: Doc; l: Locale; sizes: string; className?: string; eager?: boolean }) {
-  if (!m?.url || !m.mimeType?.startsWith('image/')) return null
   // A missing dedicated alt must not hide an informative archive photo from assistive technology.
-  const alt = pick(m.alt, l) ?? pick(m.caption, l)
+  const alt = pick(m?.alt, l) ?? pick(m?.caption, l)
+  const yt = typeof m?.youtube_url === 'string' ? youtubeId(m.youtube_url) : undefined
+  if (yt && !m.url) {
+    // A link-only video has no file of its own: show YouTube's still for it (16:9, no letterbox).
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- remote still, fixed sizes from YouTube
+      <img
+        src={`https://i.ytimg.com/vi/${yt}/mqdefault.jpg`}
+        srcSet={`https://i.ytimg.com/vi/${yt}/mqdefault.jpg 320w, https://i.ytimg.com/vi/${yt}/maxresdefault.jpg 1280w`}
+        sizes={sizes}
+        width={320}
+        height={180}
+        alt={alt ? stripMarkers(alt.value) : ''}
+        lang={alt && alt.lang !== l ? alt.lang : undefined}
+        loading={eager ? undefined : 'lazy'}
+        decoding="async"
+        className={className}
+      />
+    )
+  }
+  if (!m?.url || !m.mimeType?.startsWith('image/')) return null
   const copies = [m.sizes?.thumbnail, m.sizes?.large].filter((s) => s?.url && s.width)
   return (
     // eslint-disable-next-line @next/next/no-img-element -- files are served from R2, already resized (plan §6.3)
