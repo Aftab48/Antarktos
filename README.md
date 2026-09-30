@@ -125,5 +125,3 @@ npm run test:e2e                                        # Playwright, against th
 ## Content sources
 
 Demo content comes from public NCPOR and Ministry of Earth Sciences pages and reports, Wikipedia (CC BY-SA) and Wikimedia Commons. Every record shows its source, license and credit.
-
-This is a hackathon prototype. It is not an official NCPOR or Ministry of Earth Sciences website.

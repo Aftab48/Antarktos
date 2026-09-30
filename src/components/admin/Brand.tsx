@@ -11,7 +11,7 @@ export function PortalLogo() {
 export function PortalIcon() { return <Mark className="science-mark science-mark--icon" /> }
 
 export function LoginIntroduction() {
-  return <div className="science-login-intro"><p className="science-eyebrow">Staff access</p><h1>Sign in to the workspace</h1><p>Manage archive records, review cited drafts and publish approved outreach.</p><p className="science-muted">SIH 2026 prototype · Not an official government website.</p></div>
+  return <div className="science-login-intro"><p className="science-eyebrow">Staff access</p><h1>Sign in to the workspace</h1><p>Manage archive records, review cited drafts and publish approved outreach.</p><p className="science-muted">Smart India Hackathon 2026 · PS 26063</p></div>
 }
 
 export function WorkspaceIntroduction() {

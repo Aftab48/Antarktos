@@ -33,10 +33,10 @@ test('loading states are localized, announced once and keep placeholders decorat
   }
 })
 
-test('staff login branding provides a heading and preserves the prototype disclosure', () => {
+test('staff login branding provides a heading and names the hackathon', () => {
   const document = documentFor(renderToStaticMarkup(<><PortalLogo /><LoginIntroduction /></>))
   assert.equal(document.querySelectorAll('h1').length, 1)
-  assert.match(document.body.textContent ?? '', /Not an official government website/)
+  assert.match(document.body.textContent ?? '', /Smart India Hackathon 2026/)
   assert.match(document.body.textContent ?? '', /Antarktos/)
 })
 
