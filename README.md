@@ -31,7 +31,7 @@ India has four decades of polar research: expedition reports, datasets, publicat
 | Compare | Side-by-side table of two expeditions or two stations, straight from the archive data |
 | Ask the archive | Plain-language questions, answered only from published records, with numbered sources that open the PDF at the cited page |
 | Learn | Student explainers grouped by topic, each with a five-question quiz |
-| News | Approved outreach posts with copy and share buttons, sources, and who approved them and when |
+| News | Approved outreach posts with copy and share buttons, sources, the approval date and the model and prompt version that drafted them |
 | Datasets | DCAT-style metadata (parameters, time range, bounding box, DOI); CSV files get a preview of the first rows |
 | Open data | Read-only JSON API for every public collection (see `/about/api`) |
 
