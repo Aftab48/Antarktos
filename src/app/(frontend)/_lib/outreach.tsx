@@ -38,7 +38,7 @@ export function PostCard({ post, l }: { post: Doc; l: Locale }) {
     {media && <MediaImage m={media} l={l} sizes="(min-width: 768px) 30vw, 90vw" className="aspect-[3/2] w-full rounded-xl object-cover" />}
     <Meta items={[<span key="p" className="font-medium text-night">{platformLabel(l, post.platform)}</span>, <time key="d" dateTime={post.createdAt}>{formatDate(l, post.createdAt)}</time>]} />
     <h2 className={h3}><a href={href(l, postPath(post))} className="underline decoration-transparent hover:decoration-night"><PostTitle post={post} l={l} /></a></h2>
-    <p className="line-clamp-3 text-slate" lang={post.language}>{copyText({ body: post.body })}</p>
+    <p className="line-clamp-3 text-slate" lang={post.language}>{copyText({ body: post.body }).replace(/^#{1,3}\s+/gm, '')}</p>
     <a href={href(l, postPath(post))} className="mt-auto inline-flex min-h-11 items-center font-medium underline">{t(post.platform === 'student_explainer' ? 'learn.read' : 'outreach.read')}</a>
   </article>
 }
